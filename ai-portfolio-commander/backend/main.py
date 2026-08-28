@@ -7,3 +7,8 @@ def home():
     return {
         "message": "welcome to the AI Portfolio Commander"
     }
+@app.get("/health")
+def health_check():
+    return {
+        "status": "healthy"
+    }
