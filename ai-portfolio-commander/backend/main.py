@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from data import projects
 
+from routes.projects import router
 
 app = FastAPI(
     title="AI Portfolio Commander",
     version="1.0"
 )
+
+app.include_router(router)
 
 
 @app.get("/")
@@ -28,6 +31,7 @@ def about():
         "project": "AI Portfolio Commander",
         "version": "1.0"
     }
+
 
 @app.get("/projects")
 def get_projects():
