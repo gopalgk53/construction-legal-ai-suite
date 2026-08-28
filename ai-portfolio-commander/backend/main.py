@@ -4,7 +4,6 @@ app = FastAPI()
 
 @app.get("/")
 def home():
-    return (
+    return {
         "message": "welcome to the AI Portfolio Commander"
-    )
-,,
+    }
