@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from data import projects
+
 
 app = FastAPI(
     title="AI Portfolio Commander",
@@ -27,3 +29,6 @@ def about():
         "version": "1.0"
     }
 
+@app.get("/projects")
+def get_projects():
+    return projects
