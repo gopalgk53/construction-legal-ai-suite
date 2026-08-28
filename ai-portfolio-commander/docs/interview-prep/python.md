@@ -13,7 +13,7 @@ Virtual environments provide dependency isolation, reproducibility, and deployme
 
 ### Real-World Example
 
-Project A:
+Project A: 
 
 FastAPI 0.115
 
