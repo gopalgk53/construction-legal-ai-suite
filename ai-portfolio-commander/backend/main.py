@@ -33,6 +33,4 @@ def about():
     }
 
 
-@app.get("/projects")
-def get_projects():
-    return projects
+app.include_router(router)
