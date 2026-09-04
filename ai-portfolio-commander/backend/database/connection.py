@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 
-DATABASE_URL = (
-    "postgresql://gopalakrishnagk53@localhost:5432/portfolio"
-)
+from config import settings
 
-engine = create_engine(DATABASE_URL)
+
+engine = create_engine(
+    settings.database_url
+)

@@ -24,3 +24,8 @@ class Project(Base):
         Integer,
         default=0
     )
+
+    description: Mapped[str | None] = mapped_column(
+    String(1000),
+    nullable=True,
+    )
