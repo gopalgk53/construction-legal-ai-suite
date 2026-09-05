@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-from data import projects
-
 from routes.projects import router
 
 app = FastAPI(
@@ -33,4 +31,3 @@ def about():
     }
 
 
-app.include_router(router)

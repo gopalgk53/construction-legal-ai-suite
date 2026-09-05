@@ -3,6 +3,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from database.base import Base
 
+from datetime import datetime
+
+from sqlalchemy import DateTime, Integer, String, func
+
 
 class Project(Base):
     __tablename__ = "projects"
@@ -28,4 +32,16 @@ class Project(Base):
     description: Mapped[str | None] = mapped_column(
     String(1000),
     nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
     )

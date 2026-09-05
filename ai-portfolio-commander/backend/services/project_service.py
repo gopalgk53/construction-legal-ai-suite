@@ -1,10 +1,9 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status, Depends, Query, APIRouter
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from models.project import Project
-from schemas.project import ProjectCreate
-from schemas.project import ProjectUpdate
+from schemas.project import ProjectCreate, ProjectUpdate, ProjectPatch
 from repositories import project_repository
 
 
@@ -44,8 +43,37 @@ def create_project(
 
 def get_projects(
     db: Session,
+    status: str | None = None,
+    search: str | None = None,
+    limit: int = 10,
+    offset: int = 0,
 ):
-    return project_repository.get_all_projects(db)
+    if search is not None:
+        search = search.strip()
+
+        if not search:
+            search = None
+
+    items = project_repository.get_all_projects(
+        db,
+        status=status,
+        search=search,
+        limit=limit,
+        offset=offset,
+    )
+
+    total = project_repository.count_projects(
+        db,
+        status=status,
+        search=search,
+    )
+
+    return {
+        "items": items,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }
 
 def get_project_by_id(
     db: Session,
@@ -156,4 +184,56 @@ def validate_project_state(
         raise HTTPException(
             status_code=400,
             detail="Completed projects must have 100% progress",
+        )
+
+def patch_project(
+    db: Session,
+    project_id: int,
+    project_data: ProjectPatch,
+):
+    project = project_repository.get_project_by_id(
+        db,
+        project_id,
+    )
+
+    if project is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Project not found",
+        )
+
+    update_data = project_data.model_dump(
+        exclude_unset=True
+    )
+
+    new_status = update_data.get(
+        "status",
+        project.status,
+    )
+
+    new_progress = update_data.get(
+        "progress",
+        project.progress,
+    )
+
+    validate_project_state(
+        new_status,
+        new_progress,
+    )
+
+    for field, value in update_data.items():
+        setattr(project, field, value)
+
+    try:
+        db.commit()
+        db.refresh(project)
+
+        return project
+
+    except SQLAlchemyError:
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to update project",
         )

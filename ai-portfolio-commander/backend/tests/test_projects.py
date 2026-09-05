@@ -6,13 +6,28 @@ from fastapi.testclient import TestClient
 
 from main import app
 
+import time
+
+from datetime import datetime
+
 client = TestClient(app)
 
 def test_get_projects():
     response = client.get("/projects")
 
     assert response.status_code == 200
-    assert response.json() == []
+
+    data = response.json()
+
+    assert "items" in data
+    assert "total" in data
+    assert "limit" in data
+    assert "offset" in data
+
+    assert isinstance(data["items"], list)
+    assert data["total"] == len(data["items"])
+    assert data["limit"] == 10
+    assert data["offset"] == 0
 
 def test_create_project():
     payload = {
@@ -306,6 +321,444 @@ def test_description_exceeds_max_length():
     response = client.post(
         "/projects",
         json=payload,
+    )
+
+    assert response.status_code == 422
+
+def test_patch_project_progress_only(sample_project):
+    project_id = sample_project["id"]
+
+    setup_response = client.put(
+        f"/projects/{project_id}",
+        json={
+            "name": "Sample Project",
+            "status": "In Progress",
+            "progress": 50,
+            "description": None,
+        },
+    )
+
+    assert setup_response.status_code == 200
+
+    response = client.patch(
+        f"/projects/{project_id}",
+        json={
+            "progress": 70,
+        },
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json()
+
+    assert response_data["id"] == project_id
+    assert response_data["name"] == "Sample Project"
+    assert response_data["status"] == "In Progress"
+    assert response_data["progress"] == 70
+    assert response_data["description"] is None
+
+def test_patch_project_rejects_invalid_merged_state(
+    sample_project,
+):
+    project_id = sample_project["id"]
+
+    setup_response = client.put(
+        f"/projects/{project_id}",
+        json={
+            "name": "Sample Project",
+            "status": "In Progress",
+            "progress": 50,
+            "description": None,
+        },
+    )
+
+    assert setup_response.status_code == 200
+
+    response = client.patch(
+        f"/projects/{project_id}",
+        json={
+            "status": "Completed",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Completed projects must have 100% progress"
+    }
+
+def test_patch_project_to_completed(sample_project):
+    project_id = sample_project["id"]
+
+    setup_response = client.put(
+        f"/projects/{project_id}",
+        json={
+            "name": "Sample Project",
+            "status": "In Progress",
+            "progress": 50,
+            "description": "Project currently in development",
+        },
+    )
+
+    assert setup_response.status_code == 200
+
+    response = client.patch(
+        f"/projects/{project_id}",
+        json={
+            "status": "Completed",
+            "progress": 100,
+        },
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json()
+
+    assert response_data["id"] == project_id
+    assert response_data["name"] == "Sample Project"
+    assert response_data["status"] == "Completed"
+    assert response_data["progress"] == 100
+
+    # PATCH must preserve fields that were not supplied.
+    assert response_data["description"] == (
+        "Project currently in development"
+    )
+
+def test_patch_project_clear_description(sample_project):
+    project_id = sample_project["id"]
+
+    setup_response = client.put(
+        f"/projects/{project_id}",
+        json={
+            "name": "Enterprise RAG",
+            "status": "In Progress",
+            "progress": 50,
+            "description": "Existing project description",
+        },
+    )
+
+    assert setup_response.status_code == 200
+
+    response = client.patch(
+        f"/projects/{project_id}",
+        json={
+            "description": None,
+        },
+    )
+
+    assert response.status_code == 200
+
+    response_data = response.json()
+
+    assert response_data["description"] is None
+    assert response_data["name"] == "Enterprise RAG"
+    assert response_data["status"] == "In Progress"
+    assert response_data["progress"] == 50
+
+def test_patch_missing_project():
+    response = client.patch(
+        "/projects/999999",
+        json={
+            "description": "Should not work",
+        },
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Project not found"
+    }
+
+def test_patch_project_with_blank_name(sample_project):
+    project_id = sample_project["id"]
+
+    response = client.patch(
+        f"/projects/{project_id}",
+        json={
+            "name": "   ",
+        },
+    )
+
+    assert response.status_code == 422
+
+def test_patch_project_updates_timestamp(sample_project):
+    project_id = sample_project["id"]
+
+    before_response = client.get(
+        f"/projects/{project_id}"
+    )
+
+    assert before_response.status_code == 200
+
+    before_data = before_response.json()
+
+    created_at_before = datetime.fromisoformat(
+        before_data["created_at"]
+    )
+
+    updated_at_before = datetime.fromisoformat(
+        before_data["updated_at"]
+    )
+
+    time.sleep(0.01)
+
+    response = client.patch(
+        f"/projects/{project_id}",
+        json={
+            "description": "Timestamp update test",
+        },
+    )
+
+    assert response.status_code == 200
+
+    after_data = response.json()
+
+    created_at_after = datetime.fromisoformat(
+        after_data["created_at"]
+    )
+
+    updated_at_after = datetime.fromisoformat(
+        after_data["updated_at"]
+    )
+
+    assert created_at_after == created_at_before
+    assert updated_at_after > updated_at_before
+
+def test_filter_projects_by_status():
+    client.post(
+        "/projects",
+        json={
+            "name": "Planned Project",
+            "status": "Planned",
+            "progress": 0,
+        },
+    )
+
+    client.post(
+        "/projects",
+        json={
+            "name": "Completed Project",
+            "status": "Completed",
+            "progress": 100,
+        },
+    )
+
+    response = client.get(
+        "/projects",
+        params={
+            "status": "Completed",
+        },
+    )
+
+    data = response.json()
+    projects = data["items"]
+
+    assert response.status_code == 200
+    assert len(projects) == 1
+    assert data["total"] == 1
+    assert projects[0]["name"] == "Completed Project"
+    assert projects[0]["status"] == "Completed"
+
+def test_filter_projects_with_invalid_status():
+    response = client.get(
+        "/projects",
+        params={
+            "status": "Finished",
+        },
+    )
+
+    assert response.status_code == 422
+
+def test_search_projects_by_name():
+    client.post(
+        "/projects",
+        json={
+            "name": "Enterprise RAG Platform",
+            "status": "Planned",
+            "progress": 0,
+        },
+    )
+
+    client.post(
+        "/projects",
+        json={
+            "name": "Multi-Agent Workflow",
+            "status": "Planned",
+            "progress": 0,
+        },
+    )
+
+    response = client.get(
+        "/projects",
+        params={
+            "search": "rag",
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    projects = data["items"]
+
+    assert len(projects) == 1
+    assert data["total"] == 1
+    assert projects[0]["name"] == "Enterprise RAG Platform"
+
+def test_filter_projects_by_status_and_search():
+    client.post(
+        "/projects",
+        json={
+            "name": "Enterprise RAG Production",
+            "status": "Completed",
+            "progress": 100,
+        },
+    )
+
+    client.post(
+        "/projects",
+        json={
+            "name": "Enterprise RAG Prototype",
+            "status": "Planned",
+            "progress": 0,
+        },
+    )
+
+    client.post(
+        "/projects",
+        json={
+            "name": "Multi-Agent Platform",
+            "status": "Completed",
+            "progress": 100,
+        },
+    )
+
+    response = client.get(
+        "/projects",
+        params={
+            "status": "Completed",
+            "search": "rag",
+        },
+    )
+
+    data = response.json()
+    projects = data["items"]
+
+    assert response.status_code == 200
+    assert len(projects) == 1
+    assert data["total"] == 1
+    assert projects[0]["name"] == "Enterprise RAG Production"
+    assert projects[0]["status"] == "Completed"
+
+def test_blank_search_returns_all_projects():
+    client.post(
+        "/projects",
+        json={
+            "name": "Enterprise RAG",
+            "status": "Planned",
+            "progress": 0,
+        },
+    )
+
+    client.post(
+        "/projects",
+        json={
+            "name": "Multi-Agent Workflow",
+            "status": "Planned",
+            "progress": 0,
+        },
+    )
+
+    response = client.get(
+        "/projects",
+        params={
+            "search": "   ",
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    projects = data["items"]
+
+    assert len(projects) == 2
+    assert data["total"] == 2
+
+def test_projects_pagination():
+    for index in range(5):
+        response = client.post(
+            "/projects",
+            json={
+                "name": f"Project {index + 1}",
+                "status": "Planned",
+                "progress": 0,
+            },
+        )
+
+        assert response.status_code == 201
+
+    response = client.get(
+        "/projects",
+        params={
+            "limit": 2,
+            "offset": 1,
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    projects = data["items"]
+
+    assert len(projects) == 2
+    assert data["total"] == 5
+    assert data["limit"] == 2
+    assert data["offset"] == 1
+
+    assert projects[0]["name"] == "Project 2"
+    assert projects[1]["name"] == "Project 3"
+
+def test_project_route_contract():
+    schema = client.app.openapi()
+
+    paths = schema["paths"]
+
+    assert "/projects" in paths
+    assert "/projects/{project_id}" in paths
+
+    assert "get" in paths["/projects"]
+    assert "post" in paths["/projects"]
+
+    assert "get" in paths["/projects/{project_id}"]
+    assert "put" in paths["/projects/{project_id}"]
+    assert "patch" in paths["/projects/{project_id}"]
+    assert "delete" in paths["/projects/{project_id}"]
+
+def test_projects_pagination_rejects_zero_limit():
+    response = client.get(
+        "/projects",
+        params={
+            "limit": 0,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_projects_pagination_rejects_limit_above_maximum():
+    response = client.get(
+        "/projects",
+        params={
+            "limit": 101,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_projects_pagination_rejects_negative_offset():
+    response = client.get(
+        "/projects",
+        params={
+            "offset": -1,
+        },
     )
 
     assert response.status_code == 422
