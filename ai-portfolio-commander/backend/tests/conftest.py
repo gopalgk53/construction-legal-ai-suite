@@ -1,10 +1,12 @@
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from main import app
-from database.dependency import get_db
+
+from config import settings
 from database.base import Base
+from database.dependency import get_db
+from main import app
 from models.project import Project
-import pytest
 
 
 def override_get_db():
@@ -17,9 +19,12 @@ def override_get_db():
         db.close()
 
 
-TEST_DATABASE_URL = (
-    "postgresql://gopalakrishnagk53@localhost:5432/portfolio_test"
-)
+if settings.test_database_url is None:
+    raise RuntimeError(
+        "TEST_DATABASE_URL must be configured for integration tests"
+    )
+
+TEST_DATABASE_URL = settings.test_database_url
 
 
 test_engine = create_engine(
@@ -46,25 +51,20 @@ def reset_database():
 
 @pytest.fixture
 def sample_project():
-    db = TestingSessionLocal()
+    with TestingSessionLocal() as db:
+        project = Project(
+            name="Sample Project",
+            status="Planned",
+            progress=0,
+        )
 
-    project = Project(
-        name="Sample Project",
-        status="Planned",
-        progress=0,
-    )
+        db.add(project)
+        db.commit()
+        db.refresh(project)
 
-    db.add(project)
-    db.commit()
-    db.refresh(project)
-
-    project_data = {
-        "id": project.id,
-        "name": project.name,
-        "status": project.status,
-        "progress": project.progress,
-    }
-
-    db.close()
-
-    return project_data
+        return {
+            "id": project.id,
+            "name": project.name,
+            "status": project.status,
+            "progress": project.progress,
+        }
