@@ -1,10 +1,13 @@
 from fastapi import FastAPI
 from routes.projects import router
+from routes.milestones import router as milestones_router
 
 app = FastAPI(
     title="AI Portfolio Commander",
     version="1.0"
 )
+
+app.include_router(milestones_router)
 
 app.include_router(router)
 
