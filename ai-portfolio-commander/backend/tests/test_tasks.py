@@ -231,3 +231,85 @@ def test_delete_task(sample_project):
     assert get_response.json() == {
         "detail": "Task not found"
     }
+
+def test_task_completion_updates_milestone_progress(
+    sample_project,
+):
+    project_id = sample_project["id"]
+    milestone = create_test_milestone(project_id)
+
+    first_task = create_test_task(
+        project_id,
+        milestone["id"],
+    )
+    second_task = create_test_task(
+        project_id,
+        milestone["id"],
+    )
+
+    milestone_url = (
+        f"/projects/{project_id}"
+        f"/milestones/{milestone['id']}"
+    )
+
+    response = client.get(milestone_url)
+
+    assert response.json()["progress"] == 0
+    assert response.json()["status"] == "Planned"
+
+    client.patch(
+        f"{milestone_url}/tasks/{first_task['id']}",
+        json={"status": "Completed"},
+    )
+
+    response = client.get(milestone_url)
+
+    assert response.json()["progress"] == 50
+    assert response.json()["status"] == "In Progress"
+
+    client.patch(
+        f"{milestone_url}/tasks/{second_task['id']}",
+        json={"status": "Completed"},
+    )
+
+    response = client.get(milestone_url)
+
+    assert response.json()["progress"] == 100
+    assert response.json()["status"] == "Completed"
+
+def test_deleting_completed_task_recalculates_progress(
+    sample_project,
+):
+    project_id = sample_project["id"]
+    milestone = create_test_milestone(project_id)
+
+    completed_task = create_test_task(
+        project_id,
+        milestone["id"],
+    )
+    create_test_task(
+        project_id,
+        milestone["id"],
+    )
+
+    milestone_url = (
+        f"/projects/{project_id}"
+        f"/milestones/{milestone['id']}"
+    )
+
+    client.patch(
+        f"{milestone_url}/tasks/{completed_task['id']}",
+        json={"status": "Completed"},
+    )
+
+    response = client.get(milestone_url)
+    assert response.json()["progress"] == 50
+
+    client.delete(
+        f"{milestone_url}/tasks/{completed_task['id']}"
+    )
+
+    response = client.get(milestone_url)
+
+    assert response.json()["progress"] == 0
+    assert response.json()["status"] == "Planned"

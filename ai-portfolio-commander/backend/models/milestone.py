@@ -46,6 +46,13 @@ class Milestone(Base):
         nullable=False,
     )
 
+    progress: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+        nullable=False,
+    )
+
     due_date: Mapped[date | None] = mapped_column(
         Date,
         nullable=True,

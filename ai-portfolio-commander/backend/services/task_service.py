@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from models.milestone import Milestone
 from models.task import Task
 from repositories import task_repository
 from schemas.task import (
@@ -13,14 +14,13 @@ from services.milestone_service import (
     get_milestone_by_id as get_scoped_milestone,
 )
 
-
 def create_task(
     db: Session,
     project_id: int,
     milestone_id: int,
     task_data: TaskCreate,
 ):
-    get_scoped_milestone(
+    milestone = get_scoped_milestone(
         db,
         project_id,
         milestone_id,
@@ -40,6 +40,13 @@ def create_task(
             db,
             task,
         )
+        db.flush()
+
+        recalculate_milestone_progress(
+            db,
+            milestone,
+        )
+
         db.commit()
         db.refresh(task)
 
@@ -119,6 +126,12 @@ def update_task(
     task.due_date = task_data.due_date
 
     try:
+        db.flush()
+
+        recalculate_milestone_progress(
+            db,
+            task.milestone,
+        )
         db.commit()
         db.refresh(task)
 
@@ -155,6 +168,12 @@ def patch_task(
         setattr(task, field, value)
 
     try:
+        db.flush()
+
+        recalculate_milestone_progress(
+            db,
+            task.milestone,
+        )
         db.commit()
         db.refresh(task)
 
@@ -182,17 +201,24 @@ def delete_task(
         task_id,
     )
 
+    milestone = task.milestone
+
     try:
         task_repository.delete_task(
             db,
             task,
         )
-        db.commit()
+        db.flush()
 
+        recalculate_milestone_progress(
+            db,
+            milestone,
+        )
+
+        db.commit()
         return {
             "message": "Task deleted successfully"
         }
-
     except SQLAlchemyError:
         db.rollback()
 
@@ -200,3 +226,30 @@ def delete_task(
             status_code=500,
             detail="Unable to delete task",
         )
+
+def recalculate_milestone_progress(
+    db: Session,
+    milestone: Milestone,
+) -> None:
+    total, completed = (
+        task_repository.get_task_completion_counts(
+            db,
+            milestone.id,
+        )
+    )
+
+    if total == 0:
+        progress = 0
+    else:
+        progress = round(
+            completed * 100 / total
+        )
+
+    milestone.progress = progress
+
+    if completed == 0:
+        milestone.status = "Planned"
+    elif completed == total:
+        milestone.status = "Completed"
+    else:
+        milestone.status = "In Progress"

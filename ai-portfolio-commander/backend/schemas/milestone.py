@@ -73,6 +73,10 @@ class MilestoneResponse(MilestoneBase):
     project_id: int
     created_at: datetime
     updated_at: datetime
+    progress: int = Field(
+        ge=0,
+        le=100,
+    )
 
     model_config = ConfigDict(
         from_attributes=True,
