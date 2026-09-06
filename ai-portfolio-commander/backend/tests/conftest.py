@@ -1,5 +1,5 @@
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, make_url
 from sqlalchemy.orm import sessionmaker
 
 from config import settings
@@ -26,6 +26,15 @@ if settings.test_database_url is None:
 
 TEST_DATABASE_URL = settings.test_database_url
 
+test_database_name = make_url(TEST_DATABASE_URL).database
+
+if (
+    test_database_name is None
+    or not test_database_name.endswith("_test")
+):
+    raise RuntimeError(
+        "Integration tests require a database ending with '_test'"
+    )
 
 test_engine = create_engine(
     TEST_DATABASE_URL
