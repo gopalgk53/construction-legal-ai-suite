@@ -7,7 +7,7 @@ from alembic import context
 
 from config import settings
 from database.base import Base
-from models import Project, Milestone
+from models import Project, Milestone, Task
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -14,21 +14,20 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database.base import Base
 
 if TYPE_CHECKING:
-    from models.project import Project
-    from models.task import Task
+    from models.milestone import Milestone
 
 
-class Milestone(Base):
-    __tablename__ = "milestones"
+class Task(Base):
+    __tablename__ = "tasks"
 
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
     )
 
-    project_id: Mapped[int] = mapped_column(
+    milestone_id: Mapped[int] = mapped_column(
         ForeignKey(
-            "projects.id",
+            "milestones.id",
             ondelete="CASCADE",
         ),
         nullable=False,
@@ -40,9 +39,20 @@ class Milestone(Base):
         nullable=False,
     )
 
+    description: Mapped[str | None] = mapped_column(
+        String(1000),
+        nullable=True,
+    )
+
     status: Mapped[str] = mapped_column(
         String(50),
         default="Planned",
+        nullable=False,
+    )
+
+    priority: Mapped[str] = mapped_column(
+        String(20),
+        default="Medium",
         nullable=False,
     )
 
@@ -64,12 +74,6 @@ class Milestone(Base):
         nullable=False,
     )
 
-    project: Mapped["Project"] = relationship(
-        back_populates="milestones",
-    )
-
-    tasks: Mapped[list["Task"]] = relationship(
-        back_populates="milestone",
-        cascade="all, delete-orphan",
-        passive_deletes=True,
+    milestone: Mapped["Milestone"] = relationship(
+        back_populates="tasks",
     )
