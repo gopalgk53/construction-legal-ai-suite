@@ -3,6 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from models.milestone import Milestone
+from models.project import Project
 from models.task import Task
 from repositories import task_repository
 from schemas.task import (
@@ -45,6 +46,11 @@ def create_task(
         recalculate_milestone_progress(
             db,
             milestone,
+        )
+
+        recalculate_project_progress(
+            db,
+            milestone.project,
         )
 
         db.commit()
@@ -132,6 +138,12 @@ def update_task(
             db,
             task.milestone,
         )
+
+        recalculate_project_progress(
+            db,
+            task.milestone.project,
+        )
+
         db.commit()
         db.refresh(task)
 
@@ -174,6 +186,10 @@ def patch_task(
             db,
             task.milestone,
         )
+        recalculate_project_progress(
+            db,
+            task.milestone.project,
+        )
         db.commit()
         db.refresh(task)
 
@@ -215,6 +231,11 @@ def delete_task(
             milestone,
         )
 
+        recalculate_project_progress(
+            db,
+            milestone.project,
+        )
+
         db.commit()
         return {
             "message": "Task deleted successfully"
@@ -253,3 +274,31 @@ def recalculate_milestone_progress(
         milestone.status = "Completed"
     else:
         milestone.status = "In Progress"
+
+
+def recalculate_project_progress(
+    db: Session,
+    project: Project,
+) -> None:
+    total, completed = (
+        task_repository.get_project_task_completion_counts(
+            db,
+            project.id,
+        )
+    )
+
+    if total == 0:
+        progress = 0
+    else:
+        progress = round(
+            completed * 100 / total
+        )
+
+    project.progress = progress
+
+    if completed == 0:
+        project.status = "Planned"
+    elif completed == total:
+        project.status = "Completed"
+    else:
+        project.status = "In Progress"

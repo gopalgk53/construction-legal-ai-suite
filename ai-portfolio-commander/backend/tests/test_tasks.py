@@ -313,3 +313,114 @@ def test_deleting_completed_task_recalculates_progress(
 
     assert response.json()["progress"] == 0
     assert response.json()["status"] == "Planned"
+
+def test_task_completion_updates_project_progress(
+    sample_project,
+):
+    project_id = sample_project["id"]
+
+    first_milestone = create_test_milestone(
+        project_id,
+    )
+    second_milestone = create_test_milestone(
+        project_id,
+    )
+
+    first_task = create_test_task(
+        project_id,
+        first_milestone["id"],
+    )
+    second_task = create_test_task(
+        project_id,
+        second_milestone["id"],
+    )
+
+    project_url = f"/projects/{project_id}"
+
+    response = client.get(project_url)
+
+    assert response.status_code == 200
+    assert response.json()["progress"] == 0
+    assert response.json()["status"] == "Planned"
+
+    client.patch(
+        (
+            f"/projects/{project_id}"
+            f"/milestones/{first_milestone['id']}"
+            f"/tasks/{first_task['id']}"
+        ),
+        json={"status": "Completed"},
+    )
+
+    response = client.get(project_url)
+
+    assert response.json()["progress"] == 50
+    assert response.json()["status"] == "In Progress"
+
+    client.patch(
+        (
+            f"/projects/{project_id}"
+            f"/milestones/{second_milestone['id']}"
+            f"/tasks/{second_task['id']}"
+        ),
+        json={"status": "Completed"},
+    )
+
+    response = client.get(project_url)
+
+    assert response.json()["progress"] == 100
+    assert response.json()["status"] == "Completed"
+
+
+def test_deleting_task_recalculates_project_progress(
+    sample_project,
+):
+    project_id = sample_project["id"]
+
+    first_milestone = create_test_milestone(
+        project_id,
+    )
+    second_milestone = create_test_milestone(
+        project_id,
+    )
+
+    completed_task = create_test_task(
+        project_id,
+        first_milestone["id"],
+    )
+    create_test_task(
+        project_id,
+        second_milestone["id"],
+    )
+
+    first_task_url = (
+        f"/projects/{project_id}"
+        f"/milestones/{first_milestone['id']}"
+        f"/tasks/{completed_task['id']}"
+    )
+    project_url = f"/projects/{project_id}"
+
+    patch_response = client.patch(
+        first_task_url,
+        json={"status": "Completed"},
+    )
+
+    assert patch_response.status_code == 200
+
+    response = client.get(project_url)
+
+    assert response.status_code == 200
+    assert response.json()["progress"] == 50
+    assert response.json()["status"] == "In Progress"
+
+    delete_response = client.delete(
+        first_task_url,
+    )
+
+    assert delete_response.status_code == 200
+
+    response = client.get(project_url)
+
+    assert response.status_code == 200
+    assert response.json()["progress"] == 0
+    assert response.json()["status"] == "Planned"

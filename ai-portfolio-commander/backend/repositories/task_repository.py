@@ -2,6 +2,7 @@ from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
 from models.task import Task
+from models.milestone import Milestone
 
 def get_tasks_by_milestone(
     db: Session,
@@ -61,6 +62,35 @@ def get_task_completion_counts(
             ),
         )
         .filter(Task.milestone_id == milestone_id)
+        .one()
+    )
+
+    return total, completed
+
+
+def get_project_task_completion_counts(
+    db: Session,
+    project_id: int,
+) -> tuple[int, int]:
+    total, completed = (
+        db.query(
+            func.count(Task.id),
+            func.count(
+                case(
+                    (
+                        Task.status == "Completed",
+                        1,
+                    )
+                )
+            ),
+        )
+        .join(
+            Milestone,
+            Task.milestone_id == Milestone.id,
+        )
+        .filter(
+            Milestone.project_id == project_id,
+        )
         .one()
     )
 
