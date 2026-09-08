@@ -3,6 +3,9 @@ from fastapi import FastAPI
 from routes.milestones import router as milestones_router
 from routes.projects import router as projects_router
 from routes.tasks import router as tasks_router
+from routes.learning_sessions import (
+    router as learning_sessions_router,
+)
 
 app = FastAPI(
     title="AI Portfolio Commander",
@@ -11,6 +14,7 @@ app = FastAPI(
 app.include_router(projects_router)
 app.include_router(milestones_router)
 app.include_router(tasks_router)
+app.include_router(learning_sessions_router)
 
 
 @app.get("/")
