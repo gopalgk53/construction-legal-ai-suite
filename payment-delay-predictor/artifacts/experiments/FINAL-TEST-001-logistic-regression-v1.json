@@ -1,0 +1,42 @@
+{
+  "evaluation_id": "FINAL-TEST-001",
+  "model": "Logistic Regression v1",
+  "feature_contract_version": "1.0",
+  "evaluation_type": "locked_out_of_time_test",
+  "test_period": {
+    "start": "2026-06-01",
+    "end_exclusive": "2026-09-01",
+    "rows": 1479,
+    "positives": 314,
+    "positive_rate": 0.21230561189993238
+  },
+  "threshold": {
+    "value": 0.2,
+    "selection_source": "validation_set",
+    "retuned_on_test": false
+  },
+  "ranking_probability_metrics": {
+    "roc_auc": 0.6787375960197917,
+    "pr_auc": 0.3989008045519521,
+    "brier_score": 0.154922217404331
+  },
+  "operational_metrics": {
+    "precision": 0.2958500669344043,
+    "recall": 0.7038216560509554,
+    "f1": 0.41658812441093307,
+    "flagged_workflows": 747,
+    "flagged_rate": 0.5050709939148073
+  },
+  "confusion_matrix": {
+    "true_negative": 639,
+    "false_positive": 526,
+    "false_negative": 93,
+    "true_positive": 221
+  },
+  "decision": {
+    "gate": "PASS",
+    "status": "ACCEPTED_BASELINE",
+    "reason": "Logistic Regression v1 maintained stable ranking performance on the untouched out-of-time test period. The model remains the selected interpretable baseline."
+  },
+  "data_disclaimer": "Evaluation uses synthetic construction payment-protection workflow data and must not be represented as real SunRay customer or production performance."
+}

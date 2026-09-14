@@ -1,0 +1,37 @@
+{
+  "conflicting_project_information": {
+    "label": "Conflicting project information",
+    "higher": "Conflicting project information contributed to a higher predicted operational risk score.",
+    "lower": "No conflicting project information contributed to a lower predicted operational risk score."
+  },
+  "critical_field_missing": {
+    "label": "Missing critical project information",
+    "higher": "Missing critical project information contributed to a higher predicted operational risk score.",
+    "lower": "Availability of critical project information contributed to a lower predicted operational risk score."
+  },
+  "multiple_candidate_records": {
+    "label": "Multiple candidate project records",
+    "higher": "Multiple candidate project records contributed to a higher predicted operational risk score.",
+    "lower": "A more clearly identified project record contributed to a lower predicted operational risk score."
+  },
+  "prior_escalation_rate": {
+    "label": "Historical escalation pattern",
+    "higher": "The workflow's historical escalation pattern, relative to the model's training reference, contributed to a higher predicted operational risk score.",
+    "lower": "The workflow's historical escalation pattern, relative to the model's training reference, contributed to a lower predicted operational risk score."
+  },
+  "payment_chain_completeness_score": {
+    "label": "Payment-chain information completeness",
+    "higher": "Lower payment-chain information completeness relative to the model's training reference contributed to a higher predicted operational risk score.",
+    "lower": "Higher payment-chain information completeness relative to the model's training reference contributed to a lower predicted operational risk score."
+  },
+  "deadline_days_remaining": {
+    "label": "Deadline proximity",
+    "higher": "Greater deadline urgency relative to the model's training reference contributed to a higher predicted operational risk score.",
+    "lower": "More time remaining relative to the model's training reference contributed to a lower predicted operational risk score."
+  },
+  "research_confidence_score": {
+    "label": "Project research confidence",
+    "higher": "Lower project research confidence relative to the model's training reference contributed to a higher predicted operational risk score.",
+    "lower": "Higher project research confidence relative to the model's training reference contributed to a lower predicted operational risk score."
+  }
+}

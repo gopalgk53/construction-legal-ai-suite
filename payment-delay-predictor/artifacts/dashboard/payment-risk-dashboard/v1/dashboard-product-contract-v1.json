@@ -1,0 +1,143 @@
+{
+  "contract_version": "1.0.0",
+  "product_name": "Construction Payment Protection Intelligence Dashboard",
+  "flagship": "Construction Payment Protection Intelligence Engine",
+  "environment": "dev",
+  "generated_at": "2026-09-14T06:12:31.048977+00:00",
+  "purpose": "Help operations users identify construction payment-protection workflows that deserve additional operational attention and understand the model signals contributing to prioritization.",
+  "primary_users": [
+    "payment-protection operations analyst",
+    "research analyst",
+    "operations supervisor"
+  ],
+  "business_questions": [
+    "How many assessed workflows are currently flagged for operational attention?",
+    "How is model risk distributed across the assessed workflow population?",
+    "Which workflows should analysts review first?",
+    "Which operational factors contributed most to a workflow's risk score?",
+    "Are missing or conflicting project details contributing to elevated operational risk?",
+    "How does risk vary across project and workflow characteristics?"
+  ],
+  "pages": {
+    "portfolio_overview": {
+      "purpose": "Provide aggregate operational risk visibility across assessed workflows.",
+      "components": [
+        "total assessed workflows",
+        "flagged workflow count",
+        "flagged workflow rate",
+        "average predicted risk",
+        "risk-band distribution",
+        "risk trends",
+        "selected business segment breakdowns"
+      ]
+    },
+    "risk_queue": {
+      "purpose": "Prioritize workflows for human operational review.",
+      "components": [
+        "workflow identifier",
+        "assessment date",
+        "state",
+        "project type",
+        "customer role",
+        "predicted risk",
+        "model decision",
+        "deadline context",
+        "critical information indicators",
+        "review action"
+      ]
+    },
+    "workflow_assessment": {
+      "purpose": "Score a single workflow using the approved prediction API.",
+      "components": [
+        "14-feature input form",
+        "predicted risk",
+        "operational threshold",
+        "model decision",
+        "customer-safe explanation",
+        "governance disclaimer"
+      ]
+    },
+    "explanation": {
+      "purpose": "Explain important model signals without exposing raw model internals.",
+      "components": [
+        "risk-supporting factors",
+        "risk-reducing factors",
+        "operational context",
+        "model limitations"
+      ]
+    }
+  },
+  "model": {
+    "model_version": "logistic-regression-v1",
+    "operational_threshold": 0.2,
+    "decision_values": [
+      "FLAGGED_BY_MODEL",
+      "NOT_FLAGGED_BY_MODEL"
+    ],
+    "risk_bands": {
+      "low": "risk < 0.20",
+      "medium": "0.20 <= risk < 0.50",
+      "high": "risk >= 0.50"
+    },
+    "risk_band_note": "The 0.50 boundary is used only for observational dashboard grouping. The approved operational model threshold remains 0.20."
+  },
+  "governance": {
+    "model_is_legal_decision_engine": false,
+    "model_is_payment_guarantee": false,
+    "automatic_external_action_allowed": false,
+    "human_review_required": true,
+    "approved_use": "Operational prioritization and workflow attention support.",
+    "prohibited_interpretations": [
+      "legal rights determination",
+      "automatic lien eligibility decision",
+      "automatic bond-claim eligibility decision",
+      "payment guarantee",
+      "automatic customer action"
+    ]
+  },
+  "explanation_policy": {
+    "customer_safe_only": true,
+    "expose_raw_coefficients": false,
+    "expose_transformed_features": false,
+    "expose_internal_log_odds": false,
+    "approved_business_features": [
+      "conflicting_project_information",
+      "critical_field_missing",
+      "multiple_candidate_records",
+      "prior_escalation_rate",
+      "payment_chain_completeness_score",
+      "deadline_days_remaining",
+      "research_confidence_score"
+    ]
+  },
+  "data_sources": {
+    "portfolio_analytics": {
+      "source": "AWS Athena",
+      "database": "construction_payment_risk_dev",
+      "table": "payment_risk"
+    },
+    "live_prediction": {
+      "source": "Prediction API",
+      "model_version": "logistic-regression-v1"
+    },
+    "monitoring": {
+      "source": "Amazon CloudWatch",
+      "note": "System monitoring remains separate from business dashboard analytics."
+    }
+  },
+  "privacy": {
+    "production_raw_payload_logging": false,
+    "sensitive_customer_data_required_for_demo": false,
+    "portfolio_data_policy": "Synthetic/public-safe data only",
+    "display_internal_model_details": false
+  },
+  "non_goals": [
+    "replace human operational review",
+    "provide legal advice",
+    "determine statutory rights",
+    "automatically send notices",
+    "automatically file liens",
+    "automatically initiate bond claims",
+    "replace the CloudWatch monitoring dashboard"
+  ]
+}

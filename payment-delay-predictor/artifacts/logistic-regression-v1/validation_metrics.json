@@ -1,0 +1,10 @@
+{
+  "roc_auc": 0.674588071379722,
+  "pr_auc": 0.40361726256746655,
+  "brier_score": 0.17564685715353803,
+  "naive_brier_score": 0.18846687456465572,
+  "candidate_threshold": 0.2,
+  "precision_at_020": 0.3462,
+  "recall_at_020": 0.7211,
+  "f1_at_020": 0.4678
+}

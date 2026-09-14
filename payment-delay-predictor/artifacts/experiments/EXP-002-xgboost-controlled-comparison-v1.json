@@ -1,0 +1,38 @@
+{
+  "experiment_id": "EXP-002",
+  "experiment_name": "xgboost-controlled-comparison-v1",
+  "created_at_utc": "2026-09-11T04:44:11.595884+00:00",
+  "feature_contract": {
+    "version": "xgb-v1",
+    "feature_count": 30,
+    "categorical_count": 5,
+    "numeric_count": 13,
+    "binary_count": 12
+  },
+  "validation_results": {
+    "xgb_baseline": {
+      "roc_auc": 0.661,
+      "pr_auc": 0.3917,
+      "brier": 0.1781
+    },
+    "xgb_a_conservative": {
+      "roc_auc": 0.6725,
+      "pr_auc": 0.4027,
+      "brier": 0.1756
+    },
+    "xgb_b_balanced": {
+      "roc_auc": 0.6683,
+      "pr_auc": 0.4003,
+      "brier": 0.1763
+    },
+    "xgb_c_regularized": {
+      "roc_auc": 0.6728,
+      "pr_auc": 0.404,
+      "brier": 0.1754
+    }
+  },
+  "champion": "Logistic Regression v1",
+  "challenger": "XGB-C-regularized",
+  "decision": "Retain Logistic Regression v1 as champion. XGB-C produced marginally better PR-AUC and Brier but lower ROC-AUC. Improvements were too small to justify replacing the simpler interpretable model.",
+  "test_status": "LOCKED_NOT_EVALUATED"
+}

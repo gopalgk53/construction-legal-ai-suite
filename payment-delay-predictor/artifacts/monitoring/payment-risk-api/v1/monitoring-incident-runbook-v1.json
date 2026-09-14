@@ -1,0 +1,155 @@
+{
+  "runbook_version": "1.0.0",
+  "system": "Construction Payment Risk Intelligence API",
+  "model_version": "logistic-regression-v1",
+  "environment": "dev",
+  "generated_at": "2026-09-14T05:54:51.567105+00:00",
+  "general_response_process": [
+    "Acknowledge the monitoring signal.",
+    "Confirm the signal using CloudWatch metrics and logs.",
+    "Determine whether the issue is service, input, drift, or model related.",
+    "Correlate using request IDs where applicable.",
+    "Assess business and operational impact.",
+    "Mitigate without bypassing validation or governance controls.",
+    "Document findings and corrective action.",
+    "Escalate for human review when required."
+  ],
+  "incidents": {
+    "server_error_rate": {
+      "alarm": "construction-payment-risk-server-error-rate-dev",
+      "severity": "high",
+      "trigger": "Server error rate > 5% during a 5-minute period.",
+      "investigate": [
+        "Inspect structured application logs.",
+        "Check recent deployments or configuration changes.",
+        "Verify model artifacts can be loaded.",
+        "Check AWS dependency failures.",
+        "Check infrastructure/resource saturation.",
+        "Correlate failures using request_id."
+      ],
+      "mitigation": [
+        "Rollback a faulty deployment if identified.",
+        "Restore unavailable dependencies.",
+        "Correct configuration or artifact problems.",
+        "Keep monitoring failures isolated from inference."
+      ],
+      "do_not": [
+        "Disable API validation to reduce errors.",
+        "Expose raw customer payloads during debugging.",
+        "Silently change the model decision threshold."
+      ]
+    },
+    "high_latency": {
+      "alarm": "construction-payment-risk-p95-latency-dev",
+      "severity": "medium",
+      "trigger": "p95 API latency > 1000 ms during a 5-minute period.",
+      "investigate": [
+        "Inspect latency trend and request volume.",
+        "Check inference execution time.",
+        "Check AWS service latency.",
+        "Check CPU/memory/resource pressure.",
+        "Compare against recent deployments."
+      ],
+      "mitigation": [
+        "Remove unnecessary synchronous operations.",
+        "Optimize inference path.",
+        "Scale serving resources when justified.",
+        "Rollback performance-regressing changes."
+      ]
+    },
+    "validation_failure_rate": {
+      "alarm": "construction-payment-risk-validation-failure-rate-dev",
+      "severity": "medium",
+      "trigger": "Validation failure rate > 10% during a 15-minute period.",
+      "investigate": [
+        "Check ValidationFailureCount.",
+        "Check MissingRequiredFieldCount.",
+        "Inspect validation error types without logging raw payloads.",
+        "Check upstream schema/API contract changes.",
+        "Check whether clients are using unsupported values."
+      ],
+      "mitigation": [
+        "Correct upstream integration errors.",
+        "Coordinate intentional schema changes through versioning.",
+        "Update the API contract only through controlled release."
+      ],
+      "do_not": [
+        "Relax validation solely to suppress the alarm.",
+        "Accept unknown categories without model-impact review."
+      ]
+    },
+    "significant_feature_drift": {
+      "alarm": "construction-payment-risk-significant-feature-drift-dev",
+      "severity": "medium",
+      "trigger": "At least one monitored feature reaches SIGNIFICANT_DRIFT.",
+      "investigate": [
+        "Identify affected features.",
+        "Review PSI, binary-rate shift, or TVD.",
+        "Compare current population with training reference.",
+        "Check upstream data-generation or schema changes.",
+        "Check whether the shift is expected business seasonality.",
+        "Review prediction-distribution changes.",
+        "Obtain labeled outcomes when available."
+      ],
+      "mitigation": [
+        "Continue monitoring if drift is legitimate and low risk.",
+        "Correct upstream data defects when confirmed.",
+        "Perform model evaluation using labeled outcomes.",
+        "Consider retraining only after evidence-based review."
+      ],
+      "do_not": [
+        "Assume drift means accuracy degraded.",
+        "Automatically retrain solely because PSI/TVD crossed a threshold.",
+        "Automatically change the operational threshold."
+      ]
+    },
+    "unseen_category": {
+      "alarm": "construction-payment-risk-unseen-category-dev",
+      "severity": "high",
+      "trigger": "One or more categorical values are absent from the training reference vocabulary.",
+      "investigate": [
+        "Identify the affected feature and category.",
+        "Determine whether it is a data-quality error.",
+        "Determine whether it represents a legitimate new business value.",
+        "Review API/schema compatibility.",
+        "Assess whether training data must be expanded."
+      ],
+      "mitigation": [
+        "Correct invalid upstream values.",
+        "Version schema changes where required.",
+        "Evaluate legitimate new categories before model updates."
+      ],
+      "do_not": [
+        "Silently map an unknown category to an arbitrary known value.",
+        "Automatically retrain without validation and approval."
+      ]
+    }
+  },
+  "model_performance_degradation": {
+    "automatic_detection_available": false,
+    "reason": "True model performance requires observed outcome labels. Current online monitoring primarily observes service health, input quality, prediction behaviour, and population drift.",
+    "when_labels_arrive": [
+      "Join predictions to observed outcomes using governed identifiers.",
+      "Calculate ROC AUC.",
+      "Calculate PR AUC.",
+      "Calculate Brier score.",
+      "Calculate precision, recall, F1 and confusion matrix at threshold 0.20.",
+      "Review calibration.",
+      "Compare against approved baseline and previous periods.",
+      "Perform human review before retraining or model replacement."
+    ]
+  },
+  "governance": {
+    "automatic_retraining_allowed": false,
+    "automatic_threshold_change_allowed": false,
+    "automatic_legal_action_allowed": false,
+    "human_approval_required_for": [
+      "production model replacement",
+      "operational threshold change",
+      "retraining promotion",
+      "material schema change",
+      "legal or compliance interpretation",
+      "high-impact external action"
+    ]
+  }
+}

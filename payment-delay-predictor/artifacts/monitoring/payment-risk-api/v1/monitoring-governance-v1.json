@@ -1,0 +1,173 @@
+{
+  "manifest_version": "1.0.0",
+  "model_version": "logistic-regression-v1",
+  "environment": "dev",
+  "system": "Construction Payment Risk Intelligence API",
+  "generated_at": "2026-09-14T05:53:31.998387+00:00",
+  "purpose": "Define operational monitoring, model-input monitoring, prediction-behaviour monitoring, alert interpretation, limitations, and human-response expectations.",
+  "principles": {
+    "monitoring_failure_must_not_break_inference": true,
+    "raw_request_payload_logging_allowed": false,
+    "raw_transformed_features_logging_allowed": false,
+    "drift_is_not_proof_of_performance_degradation": true,
+    "true_performance_monitoring_requires_labels": true,
+    "high_impact_actions_require_human_review": true
+  },
+  "service_monitoring": {
+    "RequestCount": {
+      "purpose": "Track API traffic volume.",
+      "aggregation": "Sum",
+      "period_seconds": 300
+    },
+    "ServerErrorCount": {
+      "purpose": "Track HTTP 5xx failures.",
+      "aggregation": "Sum",
+      "alert": {
+        "type": "rate",
+        "formula": "ServerErrorCount / RequestCount * 100",
+        "threshold_percent": 5.0,
+        "comparison": ">",
+        "period_seconds": 300
+      },
+      "response": "Inspect application logs, dependency failures, recent deployments, model loading, and infrastructure."
+    },
+    "LatencyMs": {
+      "purpose": "Track request latency.",
+      "aggregation": "p95",
+      "alert": {
+        "threshold_ms": 1000,
+        "comparison": ">",
+        "period_seconds": 300
+      },
+      "response": "Inspect model inference time, downstream AWS calls, resource saturation, and deployment changes."
+    }
+  },
+  "input_quality_monitoring": {
+    "ValidationFailureCount": {
+      "purpose": "Track requests rejected by API validation.",
+      "alert": {
+        "type": "rate",
+        "formula": "ValidationFailureCount / RequestCount * 100",
+        "threshold_percent": 10.0,
+        "comparison": ">",
+        "period_seconds": 900
+      },
+      "response": "Check upstream schema changes, malformed integration traffic, missing fields, and client contract mismatch."
+    },
+    "MissingRequiredFieldCount": {
+      "purpose": "Track required input fields absent from requests."
+    },
+    "ClientErrorCount": {
+      "purpose": "Track HTTP 4xx client-side failures."
+    }
+  },
+  "prediction_monitoring": {
+    "PredictionCount": {
+      "purpose": "Track prediction volume."
+    },
+    "PredictedRisk": {
+      "purpose": "Monitor aggregate predicted risk behaviour.",
+      "note": "Prediction distribution changes may reflect population change and do not alone prove model degradation."
+    },
+    "FlaggedCount": {
+      "purpose": "Track predictions above the frozen operational model threshold.",
+      "model_threshold": 0.2
+    },
+    "risk_bands": {
+      "low": {
+        "condition": "risk < 0.20"
+      },
+      "medium": {
+        "condition": "0.20 <= risk < 0.50"
+      },
+      "high": {
+        "condition": "risk >= 0.50"
+      },
+      "note": "0.50 is an observational monitoring boundary, not the operational model decision threshold."
+    }
+  },
+  "feature_drift_monitoring": {
+    "numeric": {
+      "method": "Population Stability Index",
+      "thresholds": {
+        "stable": "PSI < 0.10",
+        "investigate": "0.10 <= PSI < 0.25",
+        "significant_drift": "PSI >= 0.25"
+      },
+      "note": "Thresholds are project operational heuristics and are not universal scientific standards."
+    },
+    "binary": {
+      "method": "Absolute positive-rate shift",
+      "thresholds": {
+        "stable": "shift < 0.10",
+        "investigate": "0.10 <= shift < 0.20",
+        "significant_drift": "shift >= 0.20"
+      }
+    },
+    "categorical": {
+      "method": "Total Variation Distance",
+      "thresholds": {
+        "stable": "TVD < 0.10",
+        "investigate": "0.10 <= TVD < 0.20",
+        "significant_drift": "TVD >= 0.20"
+      },
+      "unseen_category_detection": true
+    },
+    "alarms": {
+      "significant_feature_drift": {
+        "metric": "DriftedFeatureCount",
+        "condition": ">= 1",
+        "period_seconds": 300
+      },
+      "unseen_categories": {
+        "metric": "UnseenCategoryCount",
+        "condition": ">= 1",
+        "period_seconds": 300
+      }
+    }
+  },
+  "performance_monitoring": {
+    "current_state": "Delayed-label monitoring not yet automated.",
+    "required_when_labels_arrive": [
+      "ROC AUC",
+      "PR AUC",
+      "Brier score",
+      "precision at operational threshold",
+      "recall at operational threshold",
+      "F1 at operational threshold",
+      "confusion matrix",
+      "calibration"
+    ],
+    "important_limitation": "Without true outcomes, feature drift and prediction distribution changes cannot prove that model accuracy has deteriorated."
+  },
+  "privacy_and_logging": {
+    "allowed": [
+      "request_id",
+      "timestamp",
+      "model_version",
+      "api_version",
+      "HTTP status",
+      "latency",
+      "predicted risk",
+      "decision",
+      "aggregate monitoring metrics"
+    ],
+    "prohibited": [
+      "raw customer request payload",
+      "raw transformed feature vector",
+      "sensitive project content",
+      "raw model internals in customer response"
+    ]
+  },
+  "human_governance": {
+    "automatic_legal_decisions_allowed": false,
+    "human_review_required_for": [
+      "high-impact operational actions",
+      "legal or compliance interpretation",
+      "low-confidence cases",
+      "material drift investigation",
+      "production threshold changes",
+      "model replacement or retraining approval"
+    ]
+  }
+}

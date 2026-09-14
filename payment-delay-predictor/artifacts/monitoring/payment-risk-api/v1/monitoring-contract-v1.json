@@ -1,0 +1,142 @@
+{
+  "contract_version": "1.0",
+  "project": "Construction Payment Risk Intelligence",
+  "component": "Payment Risk Prediction API",
+  "model_version": "logistic-regression-v1",
+  "api_version": "v1.0.0",
+  "purpose": "Monitor serving reliability, input quality, prediction behavior, and model-risk signals for operational review prioritization.",
+  "monitoring_principles": {
+    "not_legal_decision_system": true,
+    "human_review_required_for_high_impact_actions": true,
+    "synthetic_model": true,
+    "test_set_consumed": true,
+    "monitoring_does_not_replace_model_revalidation": true
+  },
+  "service_health": {
+    "metrics": [
+      "request_count",
+      "success_count",
+      "client_error_count",
+      "server_error_count",
+      "latency_ms"
+    ],
+    "initial_alerts": {
+      "server_error_rate": {
+        "condition": "> 5%",
+        "window": "5 minutes"
+      },
+      "p95_latency_ms": {
+        "condition": "> 1000 ms",
+        "window": "5 minutes"
+      }
+    }
+  },
+  "input_quality": {
+    "metrics": [
+      "validation_failure_count",
+      "validation_failure_rate",
+      "unsupported_category_count",
+      "missing_required_field_count"
+    ],
+    "initial_alerts": {
+      "validation_failure_rate": {
+        "condition": "> 10%",
+        "window": "15 minutes"
+      }
+    }
+  },
+  "prediction_behavior": {
+    "metrics": [
+      "prediction_count",
+      "mean_predicted_risk",
+      "flagged_count",
+      "flagged_rate"
+    ],
+    "reference": {
+      "decision_threshold": 0.2,
+      "final_test_flagged_rate": 0.5051,
+      "final_test_mean_prediction": null
+    },
+    "notes": [
+      "Flagged-rate movement is a monitoring signal, not proof of model drift.",
+      "Changes may reflect real population changes, upstream process changes, or data-quality issues."
+    ]
+  },
+  "feature_monitoring": {
+    "numeric_features": [
+      "payment_chain_completeness_score",
+      "research_confidence_score",
+      "deadline_days_remaining",
+      "prior_escalation_rate",
+      "prior_projects_with_hiring_party",
+      "expected_party_count"
+    ],
+    "binary_features": [
+      "critical_field_missing",
+      "multiple_candidate_records",
+      "conflicting_project_information"
+    ],
+    "categorical_features": [
+      "state",
+      "project_type",
+      "public_private",
+      "customer_role",
+      "hiring_party_type"
+    ],
+    "drift_methods_planned": {
+      "numeric": [
+        "population_stability_index",
+        "distribution_summary"
+      ],
+      "categorical": [
+        "category_frequency_shift",
+        "unseen_category_count"
+      ],
+      "binary": [
+        "rate_shift"
+      ]
+    }
+  },
+  "model_performance_monitoring": {
+    "requires_delayed_labels": true,
+    "metrics_when_labels_available": [
+      "roc_auc",
+      "pr_auc",
+      "brier_score",
+      "precision",
+      "recall",
+      "f1",
+      "flagged_rate",
+      "calibration"
+    ],
+    "important_rule": "Do not infer true performance degradation from unlabeled production traffic."
+  },
+  "observability_stack": {
+    "logs": "Amazon CloudWatch Logs",
+    "custom_metrics": "Amazon CloudWatch Metrics",
+    "alarms": "Amazon CloudWatch Alarms",
+    "container_registry": "Amazon ECR",
+    "future_dashboard": "Amazon CloudWatch Dashboard"
+  },
+  "privacy_and_logging": {
+    "log_raw_request_payloads": false,
+    "log_raw_model_details": false,
+    "log_transformed_features": false,
+    "preferred_logging": [
+      "request_id",
+      "timestamp",
+      "model_version",
+      "api_version",
+      "latency_ms",
+      "http_status",
+      "predicted_risk",
+      "model_decision"
+    ]
+  },
+  "failure_response": {
+    "service_failure": "investigate immediately",
+    "input_quality_shift": "inspect upstream data/process changes",
+    "prediction_shift": "investigate population and feature drift",
+    "confirmed_performance_degradation": "freeze promotion, investigate, retrain/revalidate using a new evaluation strategy"
+  }
+}

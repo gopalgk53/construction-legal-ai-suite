@@ -1,0 +1,154 @@
+{
+  "validation_contract_version": "1.0",
+  "api_version": "v1",
+  "model": "Logistic Regression v1",
+  "unknown_fields_policy": "reject",
+  "categorical_fields": {
+    "state": {
+      "type": "string",
+      "required": true,
+      "allowed_values": [
+        "AZ",
+        "CA",
+        "FL",
+        "GA",
+        "NC",
+        "OTHER",
+        "TX"
+      ]
+    },
+    "project_type": {
+      "type": "string",
+      "required": true,
+      "allowed_values": [
+        "commercial",
+        "industrial",
+        "infrastructure",
+        "mixed_use",
+        "other",
+        "residential"
+      ]
+    },
+    "public_private": {
+      "type": "string",
+      "required": true,
+      "allowed_values": [
+        "private",
+        "public"
+      ]
+    },
+    "customer_role": {
+      "type": "string",
+      "required": true,
+      "allowed_values": [
+        "equipment_supplier",
+        "general_contractor",
+        "labor_provider",
+        "material_supplier",
+        "sub_subcontractor",
+        "subcontractor"
+      ]
+    },
+    "hiring_party_type": {
+      "type": "string",
+      "required": true,
+      "allowed_values": [
+        "general_contractor",
+        "owner",
+        "subcontractor"
+      ]
+    }
+  },
+  "numeric_fields": {
+    "payment_chain_completeness_score": {
+      "type": "float",
+      "required": true,
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "research_confidence_score": {
+      "type": "float",
+      "required": true,
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "deadline_days_remaining": {
+      "type": "integer",
+      "required": true,
+      "allow_negative": true
+    },
+    "prior_escalation_rate": {
+      "type": "float",
+      "required": true,
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "prior_projects_with_hiring_party": {
+      "type": "integer",
+      "required": true,
+      "minimum": 0
+    },
+    "expected_party_count": {
+      "type": "integer",
+      "required": true,
+      "minimum": 1
+    }
+  },
+  "binary_fields": {
+    "critical_field_missing": {
+      "type": "integer",
+      "required": true,
+      "allowed_values": [
+        0,
+        1
+      ]
+    },
+    "multiple_candidate_records": {
+      "type": "integer",
+      "required": true,
+      "allowed_values": [
+        0,
+        1
+      ]
+    },
+    "conflicting_project_information": {
+      "type": "integer",
+      "required": true,
+      "allowed_values": [
+        0,
+        1
+      ]
+    }
+  },
+  "semantic_rules": [
+    {
+      "rule_id": "SEM-001",
+      "description": "Scores representing proportions or confidence must remain between 0 and 1."
+    },
+    {
+      "rule_id": "SEM-002",
+      "description": "Binary indicators must contain exactly 0 or 1."
+    },
+    {
+      "rule_id": "SEM-003",
+      "description": "Negative deadline_days_remaining is permitted because an assessment may occur after a relevant operational deadline."
+    }
+  ],
+  "rejection_policy": {
+    "missing_required_field": "HTTP_422",
+    "invalid_type": "HTTP_422",
+    "out_of_range": "HTTP_422",
+    "unknown_field": "HTTP_422",
+    "unsupported_category": "HTTP_422"
+  },
+  "governance": {
+    "validation_occurs_before_inference": true,
+    "target_field_accepted": false,
+    "future_outcome_fields_accepted": false
+  },
+  "training_vocabulary_source": {
+    "source": "serialized Logistic Regression v1 pipeline",
+    "method": "OneHotEncoder.categories_",
+    "status": "VERIFIED"
+  }
+}

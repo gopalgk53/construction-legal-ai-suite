@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - AWS_REGION=ap-southeast-2
+      - ECR_REPOSITORY=construction-payment-risk-dashboard-dev
+      - IMAGE_TAG=dashboard-v1.0.0
+      - ECR_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - echo ECR login successful
+
+  build:
+    commands:
+      - echo Building dashboard Docker image...
+      - docker build -f Dockerfile.dashboard -t $ECR_REPOSITORY:$IMAGE_TAG .
+      - docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
+      - echo Docker build successful
+
+  post_build:
+    commands:
+      - echo Pushing dashboard image...
+      - docker push $ECR_URI:$IMAGE_TAG
+      - printf '{"ImageURI":"%s"}' $ECR_URI:$IMAGE_TAG > imageDetail.json
+      - echo Dashboard image push complete
+
+artifacts:
+  files:
+    - imageDetail.json

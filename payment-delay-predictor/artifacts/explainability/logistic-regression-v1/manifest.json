@@ -1,0 +1,29 @@
+{
+  "artifact": "Explainability v1",
+  "model": "Logistic Regression v1",
+  "methods": {
+    "global": "logistic_regression_coefficients",
+    "local": "exact_log_odds_contribution_decomposition"
+  },
+  "business_explanation_allowlist_count": 7,
+  "decision_threshold": 0.2,
+  "local_validation_cases": [
+    {
+      "type": "false_negative",
+      "workflow_position": 0,
+      "predicted_risk": 0.12149310253594506
+    },
+    {
+      "type": "false_positive",
+      "workflow_position": 916,
+      "predicted_risk": 0.8236892787655341
+    }
+  ],
+  "safety": {
+    "association_not_causation": true,
+    "legal_advice": false,
+    "customer_facing_raw_features": false,
+    "human_review_required_for_high_impact_actions": true
+  },
+  "data_disclaimer": "Model and explanations use synthetic construction payment-protection workflow data."
+}

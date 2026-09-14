@@ -1,0 +1,130 @@
+{
+  "model": "Logistic Regression v1",
+  "predicted_operational_risk": 0.12149310253594506,
+  "threshold": 0.2,
+  "model_decision": "NOT_FLAGGED_BY_MODEL",
+  "explanation": {
+    "top_factors": [
+      {
+        "feature": "prior_escalation_rate",
+        "label": "Historical escalation pattern",
+        "direction": "lower",
+        "contribution_log_odds": -0.23840813573923836,
+        "absolute_contribution": 0.23840813573923836,
+        "explanation": "The workflow's historical escalation pattern, relative to the model's training reference, contributed to a lower predicted operational risk score."
+      },
+      {
+        "feature": "deadline_days_remaining",
+        "label": "Deadline proximity",
+        "direction": "lower",
+        "contribution_log_odds": -0.1550229000078173,
+        "absolute_contribution": 0.1550229000078173,
+        "explanation": "More time remaining relative to the model's training reference contributed to a lower predicted operational risk score."
+      },
+      {
+        "feature": "payment_chain_completeness_score",
+        "label": "Payment-chain information completeness",
+        "direction": "higher",
+        "contribution_log_odds": 0.15122725102104995,
+        "absolute_contribution": 0.15122725102104995,
+        "explanation": "Lower payment-chain information completeness relative to the model's training reference contributed to a higher predicted operational risk score."
+      },
+      {
+        "feature": "research_confidence_score",
+        "label": "Project research confidence",
+        "direction": "lower",
+        "contribution_log_odds": -0.07942964600271049,
+        "absolute_contribution": 0.07942964600271049,
+        "explanation": "Higher project research confidence relative to the model's training reference contributed to a lower predicted operational risk score."
+      }
+    ],
+    "method": "exact_logistic_regression_log_odds_decomposition",
+    "reconstruction_error": 0.0
+  },
+  "raw_model_details": {
+    "intercept": -0.7013676090438278,
+    "reconstructed_probability": 0.12149310253594506,
+    "top_raw_factors": [
+      {
+        "feature": "categorical__public_private_private",
+        "transformed_value": 1.0,
+        "coefficient": -0.3200084232631471,
+        "contribution_log_odds": -0.3200084232631471,
+        "absolute_contribution": 0.3200084232631471
+      },
+      {
+        "feature": "numeric__prior_escalation_rate",
+        "transformed_value": -0.6814672186896069,
+        "coefficient": 0.34984534721666183,
+        "contribution_log_odds": -0.23840813573923836,
+        "absolute_contribution": 0.23840813573923836
+      },
+      {
+        "feature": "categorical__hiring_party_type_subcontractor",
+        "transformed_value": 1.0,
+        "coefficient": -0.23163385435739647,
+        "contribution_log_odds": -0.23163385435739647,
+        "absolute_contribution": 0.23163385435739647
+      },
+      {
+        "feature": "categorical__state_AZ",
+        "transformed_value": 1.0,
+        "coefficient": -0.17138482566217544,
+        "contribution_log_odds": -0.17138482566217544,
+        "absolute_contribution": 0.17138482566217544
+      },
+      {
+        "feature": "numeric__deadline_days_remaining",
+        "transformed_value": 0.6498186652634653,
+        "coefficient": -0.2385633228078546,
+        "contribution_log_odds": -0.1550229000078173,
+        "absolute_contribution": 0.1550229000078173
+      },
+      {
+        "feature": "numeric__payment_chain_completeness_score",
+        "transformed_value": -0.5607999928737114,
+        "coefficient": -0.2696634324942036,
+        "contribution_log_odds": 0.15122725102104995,
+        "absolute_contribution": 0.15122725102104995
+      },
+      {
+        "feature": "categorical__customer_role_material_supplier",
+        "transformed_value": 1.0,
+        "coefficient": -0.12433126501773281,
+        "contribution_log_odds": -0.12433126501773281,
+        "absolute_contribution": 0.12433126501773281
+      },
+      {
+        "feature": "categorical__project_type_infrastructure",
+        "transformed_value": 1.0,
+        "coefficient": -0.09613677294907622,
+        "contribution_log_odds": -0.09613677294907622,
+        "absolute_contribution": 0.09613677294907622
+      },
+      {
+        "feature": "numeric__research_confidence_score",
+        "transformed_value": 0.5846624728782281,
+        "coefficient": -0.13585555715879488,
+        "contribution_log_odds": -0.07942964600271049,
+        "absolute_contribution": 0.07942964600271049
+      },
+      {
+        "feature": "numeric__expected_party_count",
+        "transformed_value": -0.557534007126609,
+        "coefficient": 0.0335391751204853,
+        "contribution_log_odds": -0.01869923070064524,
+        "absolute_contribution": 0.01869923070064524
+      }
+    ]
+  },
+  "disclaimers": [
+    "Explanation describes model associations, not causation.",
+    "Prediction does not determine legal rights or provide legal advice.",
+    "Model was evaluated using synthetic construction payment-protection data."
+  ],
+  "evaluation_context": {
+    "workflow_position": 0,
+    "actual_synthetic_target": 1,
+    "case_type": "false_negative"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "protocol_version": "1.0",
+  "champion": {
+    "model": "Logistic Regression v1",
+    "feature_contract": "1.0",
+    "candidate_threshold": 0.2
+  },
+  "challenger": {
+    "model": "XGB-C-regularized",
+    "feature_contract": "xgb-v1"
+  },
+  "primary_metric": "roc_auc",
+  "secondary_metrics": [
+    "pr_auc",
+    "brier_score"
+  ],
+  "operational_metrics": [
+    "precision",
+    "recall",
+    "f1",
+    "flagged_workflow_rate"
+  ],
+  "test_period": {
+    "start": "2026-06-01",
+    "end_exclusive": "2026-09-01",
+    "expected_rows": 1479
+  },
+  "rules": [
+    "No additional feature engineering before test evaluation.",
+    "No additional hyperparameter tuning before test evaluation.",
+    "Do not select a new threshold using test labels.",
+    "Test metrics are final generalization estimates, not tuning inputs.",
+    "Model complexity must be justified by material performance improvement."
+  ],
+  "status": "FROZEN_BEFORE_TEST"
+}

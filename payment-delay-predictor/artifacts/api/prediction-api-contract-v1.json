@@ -1,0 +1,64 @@
+{
+  "api_version": "v1",
+  "service": "Construction Payment Risk Prediction API",
+  "purpose": "Score construction payment-protection workflows for operational review prioritization.",
+  "endpoints": {
+    "health": {
+      "method": "GET",
+      "path": "/health"
+    },
+    "model_metadata": {
+      "method": "GET",
+      "path": "/v1/model"
+    },
+    "prediction": {
+      "method": "POST",
+      "path": "/v1/predict"
+    }
+  },
+  "prediction_model": {
+    "model": "Logistic Regression v1",
+    "feature_contract_version": "1.0",
+    "threshold": 0.2
+  },
+  "request_features": {
+    "categorical": [
+      "state",
+      "project_type",
+      "public_private",
+      "customer_role",
+      "hiring_party_type"
+    ],
+    "numeric": [
+      "payment_chain_completeness_score",
+      "research_confidence_score",
+      "deadline_days_remaining",
+      "prior_escalation_rate",
+      "prior_projects_with_hiring_party",
+      "expected_party_count"
+    ],
+    "binary": [
+      "critical_field_missing",
+      "multiple_candidate_records",
+      "conflicting_project_information"
+    ]
+  },
+  "response_fields": [
+    "model_version",
+    "predicted_operational_risk",
+    "threshold",
+    "model_decision",
+    "explanation",
+    "disclaimers"
+  ],
+  "internal_only_fields": [
+    "raw_model_details",
+    "transformed_feature_values",
+    "raw_coefficients"
+  ],
+  "governance": {
+    "legal_decision_system": false,
+    "human_review_required_for_high_impact_actions": true,
+    "synthetic_model": true
+  }
+}

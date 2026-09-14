@@ -1,0 +1,37 @@
+{
+  "contract_version": "1.0",
+  "model": "Logistic Regression v1",
+  "prediction_target": "escalation_required",
+  "purpose": "Explain model-generated operational escalation-risk scores for construction payment-protection workflows.",
+  "supported_explanation_levels": [
+    "global",
+    "local",
+    "business_readable"
+  ],
+  "allowed_language": [
+    "contributed to a higher predicted risk score",
+    "contributed to a lower predicted risk score",
+    "associated with higher model risk",
+    "associated with lower model risk",
+    "workflow may deserve additional operational review"
+  ],
+  "prohibited_language": [
+    "caused the escalation",
+    "will result in nonpayment",
+    "will result in a lien",
+    "legal rights are preserved",
+    "legal rights are lost",
+    "customer will not pay",
+    "project will default"
+  ],
+  "interpretation_rules": {
+    "association_not_causation": true,
+    "not_legal_advice": true,
+    "not_payment_guarantee": true,
+    "human_review_required_for_high_impact_actions": true
+  },
+  "global_explanation_method": "logistic_regression_coefficients",
+  "local_explanation_method": "feature_contribution_to_log_odds",
+  "secondary_explanation_method": "SHAP",
+  "data_disclaimer": "Model was developed and evaluated using synthetic construction payment-protection workflow data."
+}

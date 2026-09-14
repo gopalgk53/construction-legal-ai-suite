@@ -1,10 +1,35 @@
+# Python virtual environments
 .venv/
-__pycache__/
-.ipynb_checkpoints/
-.DS_Store
-.env
 
+# Python generated files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Runtime logs
+*.log
+
+# Build outputs
+builds/
+dist/
+*.zip
+
+# Generated ML binaries
+artifacts/build/
+artifacts/logistic-regression-v1/*.joblib
+artifacts/logistic-regression-v1/*.pkl
+
+# Project data
 data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+
+# macOS
+.DS_Store

@@ -1,0 +1,63 @@
+{
+  "artifact_type": "prediction_api",
+  "api_name": "Construction Payment Risk Prediction API",
+  "api_version": "1.0.0",
+  "model": {
+    "model_version": "logistic-regression-v1",
+    "feature_contract_version": "1.0",
+    "decision_threshold": 0.2,
+    "status": "APPROVED_CHAMPION"
+  },
+  "purpose": "Operational risk scoring and review prioritization for construction payment-protection workflows.",
+  "endpoints": {
+    "health": {
+      "method": "GET",
+      "path": "/health"
+    },
+    "model_metadata": {
+      "method": "GET",
+      "path": "/v1/model"
+    },
+    "prediction": {
+      "method": "POST",
+      "path": "/v1/predict"
+    }
+  },
+  "application_files": [
+    "app/__init__.py",
+    "app/config.py",
+    "app/schemas.py",
+    "app/explainability.py",
+    "app/inference.py",
+    "app/main.py"
+  ],
+  "test_files": [
+    "tests/test_api.py"
+  ],
+  "test_status": {
+    "status": "PASS",
+    "tests_passed": 7,
+    "tests_failed": 0,
+    "framework": "pytest"
+  },
+  "serving_contract": {
+    "input_feature_count": 14,
+    "unknown_fields": "REJECT",
+    "unsupported_categories": "REJECT",
+    "invalid_requests_http_status": 422,
+    "internal_errors_http_status": 500
+  },
+  "explainability": {
+    "enabled": true,
+    "method": "exact_logistic_regression_log_odds_decomposition",
+    "business_safe_allowlist": true,
+    "raw_model_details_exposed": false
+  },
+  "governance": {
+    "synthetic_model": true,
+    "legal_decision_system": false,
+    "human_review_required_for_high_impact_actions": true,
+    "test_dataset_status": "CONSUMED_FINAL_EVALUATION"
+  },
+  "created_at_utc": "2026-09-11T06:12:13.675326+00:00"
+}

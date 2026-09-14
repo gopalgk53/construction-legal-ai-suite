@@ -1,0 +1,41 @@
+{
+  "version": "1.0",
+  "target": "escalation_required",
+  "categorical_features": [
+    "state",
+    "project_type",
+    "public_private",
+    "customer_role",
+    "hiring_party_type"
+  ],
+  "numeric_features": [
+    "payment_chain_completeness_score",
+    "research_confidence_score",
+    "deadline_days_remaining",
+    "prior_escalation_rate",
+    "prior_projects_with_hiring_party",
+    "expected_party_count"
+  ],
+  "binary_features": [
+    "critical_field_missing",
+    "multiple_candidate_records",
+    "conflicting_project_information"
+  ],
+  "model_features": [
+    "state",
+    "project_type",
+    "public_private",
+    "customer_role",
+    "hiring_party_type",
+    "payment_chain_completeness_score",
+    "research_confidence_score",
+    "deadline_days_remaining",
+    "prior_escalation_rate",
+    "prior_projects_with_hiring_party",
+    "expected_party_count",
+    "critical_field_missing",
+    "multiple_candidate_records",
+    "conflicting_project_information"
+  ],
+  "split_variable": "assessment_date"
+}
