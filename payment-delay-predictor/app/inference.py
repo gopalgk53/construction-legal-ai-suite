@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import joblib
 import pandas as pd
 
@@ -21,16 +23,30 @@ from app.explainability import (
 
 
 # ============================================================
-# LOAD APPROVED MODEL ARTIFACTS
+# LAZY LOAD APPROVED MODEL ARTIFACTS
 # ============================================================
 
-_model_pipeline = joblib.load(
-    MODEL_ARTIFACT_PATH
-)
+@lru_cache(maxsize=1)
+def get_model_pipeline():
+    """
+    Load the approved model only when inference is requested.
 
-_business_map = load_business_explanation_map(
-    EXPLAINABILITY_MAP_PATH
-)
+    This keeps application imports artifact-independent while
+    ensuring the real serving path still uses the approved model.
+    """
+    return joblib.load(
+        MODEL_ARTIFACT_PATH
+    )
+
+
+@lru_cache(maxsize=1)
+def get_business_explanation_map():
+    """
+    Load and cache the approved customer-safe explanation map.
+    """
+    return load_business_explanation_map(
+        EXPLAINABILITY_MAP_PATH
+    )
 
 
 # ============================================================
@@ -44,6 +60,9 @@ def predict_workflow(
     Run one validated workflow through the approved
     Logistic Regression v1 serving pipeline.
     """
+
+    model_pipeline = get_model_pipeline()
+    business_map = get_business_explanation_map()
 
     request_data = request.model_dump()
 
@@ -61,8 +80,8 @@ def predict_workflow(
 
     explanation_result = explain_workflow(
         workflow_row=workflow_row,
-        pipeline=_model_pipeline,
-        business_map=_business_map,
+        pipeline=model_pipeline,
+        business_map=business_map,
         threshold=FINAL_THRESHOLD,
         top_n=5,
     )

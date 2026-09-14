@@ -142,20 +142,56 @@ def predict(
         result = predict_workflow(
             request_data
         )
+
+        risk = float(
+            result["predicted_operational_risk"]
+        )
+
+        # ----------------------------------------------------
+        # Prediction observability
+        # Each successful prediction emits each counter once.
+        # ----------------------------------------------------
+
         emit_metric(
             metric_name="PredictionCount",
             value=1,
             unit="Count",
             dimensions=API_DIMENSIONS,
         )
-        
-        if result["model_decision"] == "FLAGGED_BY_MODEL":
+
+        emit_metric(
+            metric_name="PredictedRisk",
+            value=risk,
+            unit="None",
+            dimensions=API_DIMENSIONS,
+        )
+
+        if (
+            result["model_decision"]
+            == "FLAGGED_BY_MODEL"
+        ):
             emit_metric(
                 metric_name="FlaggedCount",
                 value=1,
                 unit="Count",
                 dimensions=API_DIMENSIONS,
             )
+
+        if risk < 0.20:
+            risk_band_metric = "LowRiskCount"
+
+        elif risk < 0.50:
+            risk_band_metric = "MediumRiskCount"
+
+        else:
+            risk_band_metric = "HighRiskCount"
+
+        emit_metric(
+            metric_name=risk_band_metric,
+            value=1,
+            unit="Count",
+            dimensions=API_DIMENSIONS,
+        )
 
         emit_structured_log(
             event_type="prediction",
@@ -163,54 +199,8 @@ def predict(
             http_status=200,
             latency_ms=0.0,
             model_version=result["model_version"],
-            predicted_risk=result[
-                "predicted_operational_risk"
-            ],
-            model_decision=result[
-                "model_decision"
-            ],
-        )
-
-        risk = float(
-            result["predicted_operational_risk"]
-        )
-        
-        emit_metric(
-            metric_name="PredictionCount",
-            value=1,
-            unit="Count",
-            dimensions=API_DIMENSIONS,
-        )
-        
-        emit_metric(
-            metric_name="PredictedRisk",
-            value=risk,
-            unit="None",
-            dimensions=API_DIMENSIONS,
-        )
-        
-        if result["model_decision"] == "FLAGGED_BY_MODEL":
-            emit_metric(
-                metric_name="FlaggedCount",
-                value=1,
-                unit="Count",
-                dimensions=API_DIMENSIONS,
-            )
-        
-        if risk < 0.20:
-            risk_band_metric = "LowRiskCount"
-        
-        elif risk < 0.50:
-            risk_band_metric = "MediumRiskCount"
-        
-        else:
-            risk_band_metric = "HighRiskCount"
-        
-        emit_metric(
-            metric_name=risk_band_metric,
-            value=1,
-            unit="Count",
-            dimensions=API_DIMENSIONS,
+            predicted_risk=risk,
+            model_decision=result["model_decision"],
         )
 
         return result
