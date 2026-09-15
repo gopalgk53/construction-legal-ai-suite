@@ -96,6 +96,30 @@ The verified DataRobot feature-effect and SHAP review supports these qualitative
 
 No unverified SHAP magnitude, feature rank, or local explanation value is published. Predictions remain subject to human review, and monitoring signals cannot automatically change the approved threshold or trigger model promotion.
 
+### Exported DataRobot evidence
+
+The following clean exports come directly from the Elastic-Net α=0.5 benchmark analysis. Charts labelled validation refer to DataRobot validation / Backtest 1; the separate holdout AUC remains 0.6840.
+
+| Model structure | Validation discrimination |
+|---|---|
+| ![Elastic-Net blueprint](docs/datarobot-evidence/blueprint.png) | ![Validation ROC curve](docs/datarobot-evidence/roc-curve-validation.png) |
+
+| Validation lift | Global SHAP impact |
+|---|---|
+| ![Validation lift chart](docs/datarobot-evidence/lift-validation.png) | ![Global SHAP relative feature impact](docs/datarobot-evidence/shap-impact.png) |
+
+#### Feature effects
+
+| Prior escalation rate | Payment-chain completeness |
+|---|---|
+| ![Feature effect for prior escalation rate](docs/datarobot-evidence/feature-effects-prior-escalation-rate.png) | ![Feature effect for payment-chain completeness](docs/datarobot-evidence/feature-effects-payment-chain-completeness-score.png) |
+
+| Critical fields missing | Conflicting project information |
+|---|---|
+| ![Feature effect for critical missing fields](docs/datarobot-evidence/feature-effects-critical-field-missing.png) | ![Feature effect for conflicting project information](docs/datarobot-evidence/feature-effects-conflicting-project-information.png) |
+
+These charts describe associations learned from synthetic data. Feature importance is not causality, and the plots must not be interpreted as legal guidance or an automated decision policy.
+
 ## Production engineering
 
 - **Versioned contracts:** feature schema, model manifest, API response, explainability behavior, dashboard behavior, and monitoring policy are committed as inspectable artifacts.
