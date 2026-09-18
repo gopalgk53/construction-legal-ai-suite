@@ -728,6 +728,46 @@ QC RULES:
 
 13. Do not search the public web for fictional synthetic identifiers.
 
+14. CUSTOMER_INPUT is valid provenance. A customer-provided operational fact
+    may remain a CUSTOMER CLAIM or UNVERIFIED without becoming a QC failure.
+
+15. Do NOT require independent documentary corroboration for every
+    customer-provided operational field. Customer-provided job amount,
+    first day on job, and similar operational fields may remain customer
+    claims unless contradictory evidence exists or the workflow explicitly
+    establishes independent verification as required.
+
+16. The customer/submitting entity is NOT automatically the property OWNER,
+    GENERAL_CONTRACTOR, or another project participant. Do not compare the
+    customer's identity against an OWNER or GENERAL_CONTRACTOR merely because
+    the customer submitted the Work Order.
+
+17. Documentary evidence that supports a customer claim does NOT replace
+    CUSTOMER_INPUT provenance. Preserve the customer claim and documentary
+    evidence as separate provenance channels.
+
+18. UNVERIFIED alone is NOT a BTP reason and is NOT a HUMAN_REVIEW condition.
+
+19. Return BTP only for a concrete actionable workflow defect such as an
+    evidence-supported customer-data mismatch, a required participant missing
+    under an established requirement, a required confirmation missing under
+    an established requirement, a spelling/data defect, an evidence mismatch,
+    or an established process failure.
+
+20. Return HUMAN_REVIEW only for unresolved MATERIAL ambiguity or conflict
+    that cannot safely be resolved by the workflow. A merely UNVERIFIED
+    customer claim is not sufficient.
+
+21. If there is no actionable BTP reason and no unresolved material
+    human-review condition, return PASS even when non-material items remain
+    UNVERIFIED.
+
+22. Do not require an additional signed contract merely because a contractual
+    relationship remains UNVERIFIED when available workflow evidence already
+    supports the relationship, unless this workflow explicitly establishes
+    that contract as required evidence.
+
+
 
 
 
@@ -1554,19 +1594,45 @@ RULES:
 
 
 
-9. If evidence cannot support a safe correction, place the issue
+9. First determine whether the QC BTP reason represents a REAL,
+   actionable mismatch or workflow defect. Do not assume a BTP reason is
+   valid merely because QC produced it.
 
+10. CUSTOMER_INPUT is valid provenance. Never propose changing a field whose
+    purpose is to record provenance from CUSTOMER_INPUT to NOC, PERMIT, BOND,
+    PROPERTY_CARD, or another evidence source. Documentary support remains
+    a separate evidence channel.
 
+11. A customer-provided fact that lacks independent corroboration may remain
+    UNVERIFIED. UNVERIFIED alone is not a correction requirement and is not
+    a HUMAN_REVIEW condition.
 
-   in unresolved_items and require HUMAN_REVIEW.
+12. Do not require independent documentary corroboration for every
+    customer-provided operational field. Customer-provided job amount,
+    first day on job, and similar operational fields may remain customer
+    claims unless contradictory evidence exists or an established workflow
+    rule explicitly requires verification.
 
+13. The customer/submitting entity is not automatically the OWNER,
+    GENERAL_CONTRACTOR, or another project participant. Do not propose
+    replacing the customer's identity with an OWNER or GENERAL_CONTRACTOR
+    merely because documentary evidence identifies those participants.
 
+14. If the alleged BTP issue is merely an UNVERIFIED customer claim, an
+    absent item for which no requirement has been established, or another
+    non-material verification gap:
+      - do not generate a correction for that issue;
+      - do not require HUMAN_REVIEW for that issue.
 
+15. HUMAN_REVIEW is reserved for an unresolved MATERIAL ambiguity or conflict
+    that cannot safely be resolved from available evidence. It is not the
+    fallback for every issue lacking documentary corroboration.
 
+16. If documentary evidence cannot support a correction for a genuinely
+    material unresolved conflict, place that material issue in
+    unresolved_items and set human_review_required=true.
 
-
-
-10. Every generated correction MUST use:
+17. Every generated correction MUST use:
 
 
 
