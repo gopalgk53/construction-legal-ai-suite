@@ -1481,3 +1481,281 @@ body {
 .signal-dot-warning {
   color: var(--warning);
 }
+
+/* ============================================================
+   GK PORTFOLIO THEME ALIGNMENT
+   Color theme + primary CTA only
+   ============================================================ */
+
+:root {
+  /* Neutral foundation */
+  --background: #050709;
+  --surface: rgba(10, 13, 16, 0.88);
+  --surface-strong: rgba(13, 17, 21, 0.96);
+
+  --border: rgba(255, 255, 255, 0.085);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  --text: #f3f5f7;
+  --muted: #7f878e;
+  --muted-strong: #a7afb6;
+
+  /* GK portfolio brand */
+  --accent: #5aa9ff;
+  --accent-strong: #8b63e6;
+  --accent-soft: rgba(90, 169, 255, 0.10);
+
+  /* Operational colors stay semantic */
+  --success: #8ef0b3;
+  --warning: #ffc778;
+  --danger: #ff8e8e;
+}
+
+
+/* ============================================================
+   PORTFOLIO ATMOSPHERE
+   ============================================================ */
+
+body {
+  background:
+    radial-gradient(
+      circle at 17% 5%,
+      rgba(61, 137, 199, 0.12),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 78% 18%,
+      rgba(126, 79, 201, 0.055),
+      transparent 26%
+    ),
+    #050709;
+}
+
+
+/* Existing ambient effects — recolor only */
+
+.ambient-orb-one {
+  background: rgba(61, 145, 218, 0.10);
+}
+
+.ambient-orb-two {
+  background: rgba(126, 79, 201, 0.075);
+}
+
+
+::selection {
+  color: #ffffff;
+  background: rgba(92, 143, 239, 0.32);
+}
+
+
+/* ============================================================
+   BRAND ACCENTS
+   Blue → Violet
+   ============================================================ */
+
+.eyebrow,
+.scenario-header .eyebrow,
+.scenario-intelligence .eyebrow {
+  color: #66b5ff;
+}
+
+
+/* Selected scenario */
+
+.scenario-option-active {
+  border-color: rgba(92, 166, 245, 0.38);
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(73, 155, 225, 0.12),
+      rgba(126, 79, 201, 0.065)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    0 0 28px rgba(66, 143, 211, 0.035);
+}
+
+
+.scenario-option-active .scenario-radio {
+  border-color: #62b4ff;
+}
+
+
+.scenario-option-active .scenario-radio span {
+  background: #62b4ff;
+
+  box-shadow:
+    0 0 8px rgba(98, 180, 255, 0.7);
+}
+
+
+/* ============================================================
+   RUN INTELLIGENCE
+   Match portfolio résumé CTA:
+   blue → violet gradient
+   ============================================================ */
+
+.run-button {
+  position: relative;
+  overflow: hidden;
+
+  color: #071018;
+
+  border: 1px solid rgba(151, 176, 255, 0.28);
+
+  background:
+    linear-gradient(
+      105deg,
+      #64b5ff 0%,
+      #718df5 48%,
+      #9470e8 100%
+    );
+
+  box-shadow:
+    0 8px 28px rgba(80, 125, 235, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30);
+
+  transition:
+    transform 180ms ease,
+    filter 180ms ease,
+    box-shadow 180ms ease;
+}
+
+
+.run-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  filter: brightness(1.07);
+
+  box-shadow:
+    0 12px 34px rgba(91, 117, 235, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+
+
+.run-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+
+.run-button:disabled {
+  opacity: 0.60;
+}
+
+
+/* ============================================================
+   ACTIVE WORKFLOW BRAND STATE
+   ============================================================ */
+
+.stage-node-active {
+  color: #77bdff;
+
+  border-color: rgba(92, 166, 245, 0.42);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(72, 153, 224, 0.10),
+      rgba(126, 79, 201, 0.07)
+    );
+
+  box-shadow:
+    0 0 22px rgba(73, 151, 222, 0.10);
+}
+
+
+.stage-line-active {
+  background:
+    linear-gradient(
+      to bottom,
+      #5eaff7,
+      #8967dd
+    );
+}
+
+
+/* ============================================================
+   BRAND-RELATED BADGES / PROVENANCE
+   ============================================================ */
+
+.provenance-target {
+  border-color: rgba(92, 166, 245, 0.20);
+
+  background:
+    linear-gradient(
+      100deg,
+      rgba(73, 155, 225, 0.075),
+      rgba(126, 79, 201, 0.035)
+    );
+}
+
+
+.target-pulse {
+  background: #62b4ff;
+
+  box-shadow:
+    0 0 10px rgba(98, 180, 255, 0.55);
+}
+
+
+.correction-status {
+  color: #7cbcff;
+
+  border-color: rgba(92, 166, 245, 0.20);
+
+  background: rgba(73, 155, 225, 0.07);
+}
+
+
+/* ============================================================
+   SEMANTIC STATES
+   These intentionally DO NOT use portfolio blue/purple.
+   ============================================================ */
+
+.status-light,
+.signal-dot {
+  background: #8ef0b3;
+}
+
+
+.status-light {
+  box-shadow: 0 0 12px rgba(142, 240, 179, 0.55);
+}
+
+
+.stage-node-passed {
+  color: #07110b;
+
+  background: #8ef0b3;
+  border-color: #8ef0b3;
+}
+
+
+.terminal-complete,
+.outcome-success {
+  border-color: rgba(142, 240, 179, 0.22);
+  background: rgba(142, 240, 179, 0.065);
+}
+
+
+.terminal-complete .terminal-symbol,
+.outcome-success {
+  color: #8ef0b3;
+}
+
+
+.terminal-review,
+.outcome-warning {
+  border-color: rgba(255, 199, 120, 0.24);
+  background: rgba(255, 199, 120, 0.06);
+}
+
+
+.terminal-review .terminal-symbol,
+.outcome-warning,
+.signal-dot-warning {
+  color: #ffc778;
+}
