@@ -1,0 +1,105 @@
+name: Deploy WO Intelligence API
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "wo-agent-orchestrator/**"
+      - ".github/workflows/deploy-wo-intelligence-api.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  RESOURCE_GROUP: rg-gopalg53-2640
+  CONTAINER_APP_ENVIRONMENT: wo-intelligence-env
+  CONTAINER_APP_NAME: wo-intelligence-api
+
+  ACR_NAME: gopalg53woacr
+  ACR_LOGIN_SERVER: gopalg53woacr-aqdvdqgtfce0ate0.azurecr.io
+  IMAGE_NAME: wo-intelligence-api
+
+  AZURE_CLIENT_ID: 4e36dbef-39e9-4aa4-8a52-b82ee618a10e
+  AZURE_TENANT_ID: c487f16f-b602-490c-bc4f-759ea841a11e
+  AZURE_SUBSCRIPTION_ID: cd558c00-c271-4138-9a49-7abee3e94068
+
+jobs:
+  build-and-deploy:
+    name: Build and deploy backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure login using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to Azure Container Registry
+        run: az acr login --name "${ACR_NAME}"
+
+      - name: Build backend image
+        run: |
+          docker build \
+            --file wo-agent-orchestrator/Dockerfile \
+            --tag "${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GITHUB_SHA}" \
+            wo-agent-orchestrator
+
+      - name: Push backend image
+        run: |
+          docker push "${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GITHUB_SHA}"
+
+      - name: Check whether Container App exists
+        id: app
+        shell: bash
+        run: |
+          if az containerapp show \
+            --name "${CONTAINER_APP_NAME}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Container App
+        if: steps.app.outputs.exists == 'false'
+        run: |
+          az containerapp create \
+            --name "${CONTAINER_APP_NAME}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --environment "${CONTAINER_APP_ENVIRONMENT}" \
+            --image "${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GITHUB_SHA}" \
+            --registry-server "${ACR_LOGIN_SERVER}" \
+            --registry-identity system \
+            --system-assigned \
+            --ingress external \
+            --target-port 8000 \
+            --min-replicas 1 \
+            --max-replicas 1 \
+            --cpu 0.5 \
+            --memory 1.0Gi
+
+      - name: Update Container App
+        if: steps.app.outputs.exists == 'true'
+        run: |
+          az containerapp update \
+            --name "${CONTAINER_APP_NAME}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --image "${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GITHUB_SHA}"
+
+      - name: Show deployed revision
+        run: |
+          az containerapp show \
+            --name "${CONTAINER_APP_NAME}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query "{FQDN:properties.configuration.ingress.fqdn,Revision:properties.latestRevisionName}" \
+            --output table
