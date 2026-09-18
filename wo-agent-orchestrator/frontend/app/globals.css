@@ -1077,3 +1077,240 @@ button {
     display: none;
   }
 }
+
+/* =========================================================
+   SCENARIO INTELLIGENCE
+   Dynamic explanation layer for synthetic demonstration WOs
+   ========================================================= */
+
+.scenario-intelligence {
+  position: relative;
+  margin-top: 14px;
+  padding: 25px;
+  overflow: hidden;
+}
+
+.scenario-intelligence::before {
+  content: "";
+  position: absolute;
+  width: 420px;
+  height: 220px;
+  top: -150px;
+  right: -100px;
+  border-radius: 50%;
+  background: rgba(118, 255, 171, 0.045);
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+.scenario-intelligence-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.scenario-intelligence-head h2 {
+  margin: 7px 0 0;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  font-weight: 540;
+}
+
+.scenario-intelligence-head p {
+  max-width: 760px;
+  margin: 11px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.scenario-intelligence-badge {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  padding: 8px 11px;
+  border: 1px solid rgba(128, 255, 180, 0.2);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-geist-mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  white-space: nowrap;
+}
+
+.scenario-intelligence-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.35fr)
+    minmax(0, 1fr)
+    minmax(210px, 0.65fr);
+  gap: 8px;
+  padding-top: 18px;
+}
+
+.scenario-intelligence-block {
+  min-width: 0;
+  min-height: 145px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.014);
+}
+
+.scenario-block-label {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.scenario-intelligence-block p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.scenario-journey {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.scenario-journey-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.scenario-journey-item span {
+  display: block;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.018);
+  color: var(--muted-strong);
+  font-family: var(--font-geist-mono);
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.scenario-journey-item:first-child span {
+  border-color: rgba(128, 255, 180, 0.18);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.scenario-journey-arrow {
+  flex-shrink: 0;
+  color: #45504b;
+  transform: rotate(45deg);
+}
+
+.scenario-outcome-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.scenario-outcome-block strong {
+  display: block;
+  color: var(--text);
+  font-family: var(--font-geist-mono);
+  font-size: 12px;
+  font-weight: 540;
+  line-height: 1.45;
+}
+
+.scenario-outcome-block small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-family: var(--font-geist-mono);
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+
+/* Scenario Intelligence responsive */
+
+@media (max-width: 1100px) {
+  .scenario-intelligence-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .scenario-outcome-block {
+    grid-column: 1 / -1;
+    min-height: 100px;
+  }
+}
+
+@media (max-width: 800px) {
+  .scenario-intelligence {
+    padding: 20px;
+  }
+
+  .scenario-intelligence-head {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .scenario-intelligence-badge {
+    align-self: flex-start;
+  }
+
+  .scenario-intelligence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-intelligence-block {
+    min-height: auto;
+  }
+
+  .scenario-outcome-block {
+    grid-column: auto;
+    min-height: 100px;
+  }
+
+  .scenario-journey {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .scenario-intelligence {
+    padding: 17px;
+  }
+
+  .scenario-intelligence-head h2 {
+    font-size: 20px;
+  }
+
+  .scenario-journey {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .scenario-journey-item {
+    width: 100%;
+  }
+
+  .scenario-journey-item span {
+    flex: 1;
+  }
+
+  .scenario-journey-arrow {
+    transform: rotate(135deg);
+  }
+}

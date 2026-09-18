@@ -13,10 +13,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import {
-  getExecution,
-  startWorkflow,
-} from "@/lib/api";
+import { getExecution, startWorkflow } from "@/lib/api";
 
 import type {
   ExecutionResponse,
@@ -26,25 +23,73 @@ import type {
 import { IntelligencePanels } from "./intelligence-panels";
 import { WorkflowRail } from "./workflow-rail";
 
-
 const scenarios = [
   {
     woId: "SYN-WO-000001",
     label: "Clean path",
-    description: "Verified workflow",
+    description: "No material conflict",
+    badge: "STRAIGHT-THROUGH",
+    title: "Clean / Verified Workflow",
+    purpose:
+      "Demonstrates autonomous processing when customer claims and available documentary evidence contain no material conflict requiring correction or human intervention.",
+    journey: [
+      "Intake",
+      "Research",
+      "Evidence",
+      "Discrepancy",
+      "QC",
+      "Complete",
+    ],
+    safety:
+      "Customer claims remain separate from researched evidence. Unverified information alone does not create a failure, BTP, or human-review requirement.",
+    expectedOutcome: "COMPLETE RECOMMENDED",
+    expectedDetail: "Human Review NO · Corrections 0",
   },
   {
     woId: "SYN-WO-000116",
-    label: "Correction",
-    description: "BTP → correction → QC",
+    label: "Correction path",
+    description: "Customer ↔ evidence mismatch",
+    badge: "CONTROLLED CORRECTION",
+    title: "Evidence-Supported Correction",
+    purpose:
+      "Demonstrates how the platform handles a genuine mismatch between a customer-provided participant value and consistent documentary evidence.",
+    journey: [
+      "Intake",
+      "Research",
+      "Evidence",
+      "Discrepancy",
+      "BTP",
+      "Correction",
+      "QC Re-review",
+      "Complete",
+    ],
+    safety:
+      "The original customer claim remains immutable. Research proposes an evidence-supported overlay, QC independently verifies it, and deterministic Python owns final acceptance.",
+    expectedOutcome: "COMPLETE RECOMMENDED",
+    expectedDetail: "Human Review NO · Corrections ≥ 1",
   },
   {
     woId: "SYN-WO-000111",
     label: "Human review",
-    description: "Evidence conflict",
+    description: "Documentary evidence conflict",
+    badge: "SAFETY ESCALATION",
+    title: "Unresolved Documentary Conflict",
+    purpose:
+      "Demonstrates the safety boundary when documentary sources disagree and the system cannot safely determine which value should control.",
+    journey: [
+      "Intake",
+      "Research",
+      "Evidence",
+      "Discrepancy",
+      "QC",
+      "Human Review",
+    ],
+    safety:
+      "Conflicting documentary evidence is preserved. The system does not arbitrarily choose a source, invent a correction, or silently overwrite evidence.",
+    expectedOutcome: "HUMAN REVIEW",
+    expectedDetail: "Human Review YES · Corrections 0",
   },
 ];
-
 
 export function IntelligenceConsole() {
   const [selectedWo, setSelectedWo] =
@@ -59,10 +104,9 @@ export function IntelligenceConsole() {
   const [error, setError] =
     useState<string | null>(null);
 
-  const pollTimer = useRef<ReturnType<
-    typeof setTimeout
-  > | null>(null);
-
+  const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   useEffect(() => {
     return () => {
@@ -71,7 +115,6 @@ export function IntelligenceConsole() {
       }
     };
   }, []);
-
 
   async function pollExecution(
     executionId: string,
@@ -96,7 +139,6 @@ export function IntelligenceConsole() {
     }
   }
 
-
   async function runIntelligence() {
     if (pollTimer.current) {
       clearTimeout(pollTimer.current);
@@ -107,8 +149,7 @@ export function IntelligenceConsole() {
     setError(null);
 
     try {
-      const started =
-        await startWorkflow(selectedWo);
+      const started = await startWorkflow(selectedWo);
 
       setStatus(started.status);
 
@@ -121,7 +162,6 @@ export function IntelligenceConsole() {
     }
   }
 
-
   const running = status === "RUNNING";
 
   const complete =
@@ -130,6 +170,10 @@ export function IntelligenceConsole() {
   const humanReview =
     status === "HUMAN_REVIEW";
 
+  const selectedScenario =
+    scenarios.find(
+      (scenario) => scenario.woId === selectedWo,
+    ) ?? scenarios[0];
 
   return (
     <main className="console-shell">
@@ -159,7 +203,6 @@ export function IntelligenceConsole() {
           </div>
         </div>
       </header>
-
 
       <section className="command-hero">
         <div className="hero-copy">
@@ -192,7 +235,6 @@ export function IntelligenceConsole() {
           <ArrowUpRight size={16} />
         </div>
       </section>
-
 
       <section className="scenario-command panel">
         <div className="scenario-header">
@@ -263,7 +305,10 @@ export function IntelligenceConsole() {
                 className="spin"
               />
             ) : (
-              <Play size={17} fill="currentColor" />
+              <Play
+                size={17}
+                fill="currentColor"
+              />
             )}
 
             <span>
@@ -280,20 +325,132 @@ export function IntelligenceConsole() {
         </div>
       </section>
 
+      {/* Scenario Intelligence */}
+
+      <AnimatePresence mode="wait">
+        <motion.section
+          key={selectedScenario.woId}
+          className="scenario-intelligence panel"
+          initial={{
+            opacity: 0,
+            y: 10,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          exit={{
+            opacity: 0,
+            y: -8,
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 200,
+            damping: 25,
+          }}
+        >
+          <div className="scenario-intelligence-head">
+            <div>
+              <div className="eyebrow">
+                Scenario intelligence
+              </div>
+
+              <h2>
+                {selectedScenario.title}
+              </h2>
+
+              <p>
+                {selectedScenario.purpose}
+              </p>
+            </div>
+
+            <div className="scenario-intelligence-badge">
+              {selectedScenario.badge}
+            </div>
+          </div>
+
+          <div className="scenario-intelligence-grid">
+            <div className="scenario-intelligence-block">
+              <span className="scenario-block-label">
+                Expected agent journey
+              </span>
+
+              <div className="scenario-journey">
+                {selectedScenario.journey.map(
+                  (stage, index) => (
+                    <div
+                      key={`${selectedScenario.woId}-${stage}`}
+                      className="scenario-journey-item"
+                    >
+                      <span>
+                        {stage}
+                      </span>
+
+                      {index <
+                        selectedScenario.journey.length -
+                          1 && (
+                        <ArrowUpRight
+                          size={13}
+                          className="scenario-journey-arrow"
+                        />
+                      )}
+                    </div>
+                  ),
+                )}
+              </div>
+            </div>
+
+            <div className="scenario-intelligence-block">
+              <span className="scenario-block-label">
+                Safety behavior
+              </span>
+
+              <p>
+                {selectedScenario.safety}
+              </p>
+            </div>
+
+            <div className="scenario-intelligence-block scenario-outcome-block">
+              <span className="scenario-block-label">
+                Expected outcome
+              </span>
+
+              <strong>
+                {selectedScenario.expectedOutcome}
+              </strong>
+
+              <small>
+                {selectedScenario.expectedDetail}
+              </small>
+            </div>
+          </div>
+        </motion.section>
+      </AnimatePresence>
+
+      {/* Runtime Error */}
 
       <AnimatePresence>
         {error && (
           <motion.div
             className="error-banner"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
+            initial={{
+              opacity: 0,
+              y: -8,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+            }}
           >
             {error}
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Live Workflow Results */}
 
       <section className="workspace-grid">
         <WorkflowRail
@@ -310,7 +467,6 @@ export function IntelligenceConsole() {
           execution={execution}
         />
       </section>
-
 
       <footer className="console-footer">
         <div>
