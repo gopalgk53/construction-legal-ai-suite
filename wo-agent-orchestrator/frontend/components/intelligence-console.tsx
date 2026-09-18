@@ -223,16 +223,14 @@ export function IntelligenceConsole() {
         </div>
 
         <div className="hero-system">
-          <Activity size={16} />
+        <Activity size={16} />
 
-          <div>
+        <div>
             <span>Orchestration</span>
             <strong>
-              Deterministic control plane
+            Deterministic control plane
             </strong>
-          </div>
-
-          <ArrowUpRight size={16} />
+        </div>
         </div>
       </section>
 
