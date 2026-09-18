@@ -14,6 +14,9 @@ permissions:
   id-token: write
 
 env:
+  AZURE_CLIENT_ID: 4e36dbef-39e9-4aa4-8a52-b82ee618a10e
+  AZURE_TENANT_ID: c487f16f-b602-490c-bc4f-759ea841a11e
+  AZURE_SUBSCRIPTION_ID: cd558c00-c271-4138-9a49-7abee3e94068
   AZURE_RESOURCE_GROUP: rg-gopalg53-2640
   CONTAINER_APP_ENVIRONMENT: wo-intelligence-env
   CONTAINER_APP_NAME: wo-intelligence-web
@@ -35,9 +38,9 @@ jobs:
       - name: Azure login with OIDC
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
       - name: Login to Azure Container Registry
         run: az acr login --name "${ACR_NAME}"
