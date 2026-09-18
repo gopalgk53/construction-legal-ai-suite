@@ -1314,3 +1314,170 @@ button {
     transform: rotate(135deg);
   }
 }
+
+/* ============================================================
+   PORTFOLIO THEME ALIGNMENT
+   Theme + primary CTA only
+   ============================================================ */
+
+:root {
+  /* Portfolio-style dark neutral foundation */
+  --background: #05050a;
+  --surface: rgba(13, 13, 20, 0.82);
+  --surface-strong: rgba(17, 17, 26, 0.94);
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  --text: #f5f5f7;
+  --muted: #85858f;
+  --muted-strong: #aaaab4;
+
+  /* Portfolio brand accent */
+  --accent: #a78bfa;
+  --accent-strong: #8b5cf6;
+  --accent-soft: rgba(139, 92, 246, 0.10);
+}
+
+
+/* ---------- Background atmosphere ---------- */
+
+body {
+  background:
+    radial-gradient(
+      circle at 45% -10%,
+      rgba(139, 92, 246, 0.10),
+      transparent 34%
+    ),
+    var(--background);
+}
+
+
+/* ---------- Ambient accents ---------- */
+
+.ambient-orb-one {
+  background: rgba(139, 92, 246, 0.09);
+}
+
+.ambient-orb-two {
+  background: rgba(99, 70, 190, 0.06);
+}
+
+
+/* ---------- Selection ---------- */
+
+::selection {
+  background: rgba(139, 92, 246, 0.28);
+}
+
+
+/* ---------- System status light ----------
+   Keep green because this represents system health,
+   not portfolio branding.
+   ----------------------------------------- */
+
+.status-light {
+  background: #7cf2a5;
+  box-shadow: 0 0 12px rgba(124, 242, 165, 0.7);
+}
+
+
+/* ---------- Primary CTA ---------- */
+
+.run-button {
+  position: relative;
+  overflow: hidden;
+
+  border: 1px solid rgba(196, 181, 253, 0.22);
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #a78bfa 0%,
+      #8b5cf6 48%,
+      #7353d6 100%
+    );
+
+  box-shadow:
+    0 10px 30px rgba(139, 92, 246, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease;
+}
+
+
+.run-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  filter: brightness(1.07);
+
+  box-shadow:
+    0 14px 38px rgba(139, 92, 246, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+}
+
+
+.run-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+
+.run-button:disabled {
+  opacity: 0.68;
+}
+
+
+/* ---------- Keep operational SUCCESS green ----------
+   Purple = brand
+   Green  = successful workflow state
+   ----------------------------------------------- */
+
+.stage-node-passed {
+  color: #07100a;
+  background: #7cf2a5;
+  border-color: #7cf2a5;
+}
+
+
+.terminal-complete {
+  border-color: rgba(124, 242, 165, 0.20);
+  background: rgba(124, 242, 165, 0.07);
+}
+
+
+.terminal-complete .terminal-symbol,
+.outcome-success {
+  color: #7cf2a5;
+}
+
+
+.outcome-success {
+  border-color: rgba(124, 242, 165, 0.24);
+  background: rgba(124, 242, 165, 0.07);
+}
+
+
+.signal-dot {
+  background: #7cf2a5;
+}
+
+
+/* ---------- Keep warning / human-review amber ---------- */
+
+.terminal-review,
+.outcome-warning {
+  border-color: rgba(255, 199, 120, 0.25);
+  background: rgba(255, 199, 120, 0.055);
+}
+
+
+.terminal-review .terminal-symbol,
+.outcome-warning,
+.signal-dot-warning {
+  color: var(--warning);
+}
