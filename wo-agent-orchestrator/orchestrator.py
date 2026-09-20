@@ -1,3 +1,5 @@
+import os
+
 from azure.identity import DefaultAzureCredential
 
 
@@ -51,6 +53,17 @@ from observability import (
 PROJECT_ENDPOINT = (
     "https://gopalg53-5366-resource.services.ai.azure.com/" "api/projects/gopalg53-5366"
 )
+
+
+# Per-agent-call request timeout. Without it, an unreachable or
+# non-responding Foundry endpoint (e.g. a Container App whose managed
+# identity can't authenticate to the project) makes responses.create() hang
+# indefinitely — the workflow thread never returns, the execution record
+# stays RUNNING forever, and the UI sits on "Running intelligence" with no
+# way out. A bounded timeout raises APITimeoutError, which propagates to the
+# service layer and marks the execution FAILED, so the UI surfaces an error
+# instead of hanging. Tunable via env; generous enough for real agent calls.
+AGENT_CALL_TIMEOUT_SECONDS = float(os.getenv("WO_AGENT_CALL_TIMEOUT", "90"))
 
 
 AUTO_APPROVED_MCP_TOOLS = {
@@ -159,6 +172,7 @@ def approve_mcp_requests(
     return openai_client.responses.create(
         previous_response_id=response.id,
         input=approval_inputs,
+        timeout=AGENT_CALL_TIMEOUT_SECONDS,
         extra_body={
             "agent_reference": {
                 "name": agent_name,
@@ -194,6 +208,7 @@ def call_agent(
                 "content": message,
             }
         ],
+        timeout=AGENT_CALL_TIMEOUT_SECONDS,
         extra_body={
             "agent_reference": {
                 "name": agent_name,
