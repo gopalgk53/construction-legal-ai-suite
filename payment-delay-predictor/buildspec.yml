@@ -15,6 +15,8 @@ phases:
       - ECR_URI=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/$REPOSITORY
       - COMMIT_SHA=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c 1-12)
       - IMAGE_TAG="api-$COMMIT_SHA"
+      - echo "Retrieving governed production model artifact from S3..."
+      - aws s3 cp "s3://construction-payment-risk-dev-gk53/artifacts/payment-risk/logistic-regression/v1/logistic_pipeline.joblib" "$PROJECT_DIR/artifacts/logistic-regression-v1/logistic_pipeline.joblib"
       - echo "Source commit $CODEBUILD_RESOLVED_SOURCE_VERSION"
       - echo "Building image $ECR_URI:$IMAGE_TAG"
       - aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ECR_URI
