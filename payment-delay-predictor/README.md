@@ -161,3 +161,40 @@ The API and dashboard use separate dependency manifests and container definition
 - **Data:** synthetic only
 
 The next valid model-selection step would be a controlled challenger evaluation using the same frozen temporal partitions, feature availability rules, and operational acceptance criteria as the production champion.
+
+## Production Deployment & Final Acceptance
+
+The Construction Payment Protection Intelligence Engine has completed end-to-end production acceptance testing on AWS.
+
+### Production Architecture
+
+```text
+User
+  │
+  ▼
+HTTPS
+payment-risk.gopalakrishnagenai.in
+  │
+  ▼
+Public Application Load Balancer
+  │
+  ▼
+Streamlit Dashboard — Amazon ECS / AWS Fargate
+  │
+  ├──► Amazon Athena / AWS Glue / Amazon S3
+  │
+  ▼
+Internal Application Load Balancer
+  │
+  ▼
+Prediction API — Amazon ECS / AWS Fargate
+  │
+  ▼
+Logistic Regression v1
+  │
+  ├──► Operational Risk Score
+  ├──► Customer-Safe Explanation
+  └──► Human Operational Review
+             │
+             ▼
+        S3 Audit Trail
