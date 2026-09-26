@@ -53,7 +53,7 @@ The research behind each notice is detailed and error-prone. Customer-provided d
 - **Cross-cloud delivery.** Data and retrieval run on AWS, the agents on Microsoft Foundry, and the API and console on Azure. Deployment runs through GitHub Actions with OIDC, so no long-lived cloud secrets are stored.
 
 ```mermaid
-flowchart LR
+flowchart TB
     A["Work order intake<br/>(synthetic dataset on S3)"] --> B["Retrieval service<br/>AWS Lambda + API Gateway"]
     B --> C["MCP adapter<br/>get_work_order (read-only)"]
     C --> D["Foundry specialist agents<br/>Intake · Research · Evidence<br/>Discrepancy · QC"]
